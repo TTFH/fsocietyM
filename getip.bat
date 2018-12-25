@@ -1,3 +1,5 @@
 @echo off
-FOR /F "tokens=17" %%i in ('"ipconfig | findstr IPv4"') do SET LOCAL_IP=%%i
-echo %LOCAL_IP% > ip
+for /f "tokens=1* delims=: " %%A in (
+  'nslookup myip.opendns.com. resolver1.opendns.com 2^>NUL^|find "Address:"'
+) do set IP=%%B
+echo %IP% > ip
