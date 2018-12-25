@@ -5,20 +5,24 @@ This project is purely academic, use at your own risk. I do not encourage in any
 
 Files are encrypted with AES256 ECB ANSI X9.23, key is stored in file "key.bin"
 
-# On movie
+![diff](https://raw.githubusercontent.com/TTFH/fsocietyM/master/example/Cryptowall3.png)
 
-![movie](https://raw.githubusercontent.com/TTFH/fsocietyM/master/example/Cryptowall1.png)
+Download Msys2 from:  
+https://www.msys2.org/
 
-# This One
-
-![this](https://raw.githubusercontent.com/TTFH/fsocietyM/master/example/Cryptowall2.png)
-
-Download XAMPP Apache from:
+Download XAMPP Apache Server from:  
 https://www.apachefriends.org/es/index.html
 
-Download Firefox from:
-https://www.mozilla.org/es-ES/firefox/all/
+Download Mozilla Firefox from:  
+https://www.mozilla.org/es-ES/firefox/all/  
 (you can edit main.cpp to use Chrome or other browser)
 
-Compile:
+Download HxD Hex Editor (optional) from:  
+https://mh-nexus.de/en/hxd/  
+(to view the file containing the decryption key)
+
+Install Compiler:  
+pacman -S mingw-w64-x86_64-toolchain
+
+Compile:  
 g++ -Wall -Werror -O3 main.cpp aes.cpp -o fsocietyM.exe
