@@ -10,9 +10,6 @@ Files are encrypted with AES256 ECB ANSI X9.23, key is stored in file "key.bin"
 Download Msys2 from:  
 https://www.msys2.org/
 
-Download XAMPP Apache Server from:  
-https://www.apachefriends.org/es/index.html
-
 Download Mozilla Firefox from:  
 https://www.mozilla.org/es-ES/firefox/all/  
 (you can edit main.cpp to use Chrome or other browser)
