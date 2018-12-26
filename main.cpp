@@ -23,7 +23,7 @@ bool isValidFile(char* file) {
 
 /*
   To encrypt files using AES 256, the file size must be a multiple of 16 bytes
-  This function adds 1 to 15 bytes to the file using ANSI X9.23 padding method
+  This function adds 1 to 16 bytes to the file using ANSI X9.23 padding method
   and returns the new file size
 */
 uint32_t ANSI_X9_23(FILE* file) {
@@ -55,13 +55,15 @@ void EncryptFile(char* fname, const uint8_t* key) {
   uint32_t size = ANSI_X9_23(file);
   uint8_t* input = new uint8_t[size];
   fread(input, 1, size, file);
+  fclose(file);
 
-  AES_encrypt(key, input, size);
+  AES_encrypt(input, size, key);
 
-/// COMMENT THE NEXT TWO LINES TO ENCRYPT FILES!!!
-  AES_decrypt(key, input, size);
+  /// DELETE THE NEXT TWO LINES TO ENCRYPT FILES!!!
+  AES_decrypt(input, size, key);
   unpad(input, size);
-/**/
+
+  file = fopen(fname, "wb");
   fwrite(input, sizeof(uint8_t), size, file);
   delete[] input;
   fclose(file);

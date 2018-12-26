@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdint.h>
 
 #include "aes.h"
@@ -288,16 +289,53 @@ void AES_ECB_decrypt(AES_ctx* ctx, uint8_t* buf) {
   InvCipher((state_t*)buf, ctx->RoundKey);
 }
 
-void AES_encrypt(const uint8_t* key, uint8_t* data, uint32_t size) {
+void AES_encrypt(uint8_t* data, uint32_t size, const uint8_t* key) {
   AES_ctx ctx;
   AES_init_ctx(&ctx, key);
   for (uint32_t i = 0; i < size / AES_BLOCKLEN; i++)
     AES_ECB_encrypt(&ctx, data + i * AES_BLOCKLEN);
 }
 
-void AES_decrypt(const uint8_t* key, uint8_t* data, uint32_t size) {
+void AES_decrypt(uint8_t* data, uint32_t size, const uint8_t* key) {
   AES_ctx ctx;
   AES_init_ctx(&ctx, key);
   for (uint32_t i = 0; i < size / AES_BLOCKLEN; i++)
     AES_ECB_decrypt(&ctx, data + i * AES_BLOCKLEN);
+}
+
+void AES_stream_encrypt(FILE* file, const uint8_t* key) {
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, key);
+  fseek(file, 0, SEEK_END);
+  uint32_t size = ftell(file);
+  uint8_t* block = new uint8_t[AES_BLOCKLEN];
+  for (uint32_t i = 0; i < size; i += AES_BLOCKLEN) {
+    fseek(file, i, SEEK_SET);
+    fread(block, 1, AES_BLOCKLEN, file);
+    AES_ECB_encrypt(&ctx, block);
+    fseek(file, i, SEEK_SET);
+    fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, file);
+  }
+  rewind(file);
+  delete[] block;
+}
+
+void AES_stream_decrypt(FILE* file, const uint8_t* key) {
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, key);
+  fseek(file, 0, SEEK_END);
+  uint32_t size = ftell(file);
+  uint8_t* block = new uint8_t[AES_BLOCKLEN];
+  for (uint32_t i = 0; i < size; i += AES_BLOCKLEN) {
+    fseek(file, i, SEEK_SET);
+    fread(block, 1, AES_BLOCKLEN, file);
+    AES_ECB_decrypt(&ctx, block);
+    fseek(file, i, SEEK_SET);
+    if (i < (size - AES_BLOCKLEN))
+      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, file);
+    else
+      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN - block[AES_BLOCKLEN - 1], file);
+  }
+  rewind(file);
+  delete[] block;
 }
