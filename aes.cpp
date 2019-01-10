@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "aes.h"
 
@@ -303,9 +304,10 @@ void AES_decrypt(uint8_t* data, uint32_t size, const uint8_t* key) {
     AES_ECB_decrypt(&ctx, data + i * AES_BLOCKLEN);
 }
 
-void AES_stream_encrypt(FILE* file, const uint8_t* key) {
+void AES_stream_encrypt(char* filename, const uint8_t* key) {
   AES_ctx ctx;
   AES_init_ctx(&ctx, key);
+  FILE* file = fopen(filename, "rb+");
   fseek(file, 0, SEEK_END);
   uint32_t size = ftell(file);
   uint8_t* block = new uint8_t[AES_BLOCKLEN];
@@ -316,26 +318,42 @@ void AES_stream_encrypt(FILE* file, const uint8_t* key) {
     fseek(file, i, SEEK_SET);
     fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, file);
   }
-  rewind(file);
   delete[] block;
+  fclose(file);
+  // Add .encrypted extension
+  char* dest = new char[strlen(filename) + 11];
+  strcpy(dest, filename);
+  strcat(dest, ".encrypted");
+  rename(filename, dest);
+  delete[] dest;
 }
 
-void AES_stream_decrypt(FILE* file, const uint8_t* key) {
+void AES_stream_decrypt(char* filename, const uint8_t* key) {
   AES_ctx ctx;
   AES_init_ctx(&ctx, key);
+  FILE* file = fopen(filename, "rb+");
   fseek(file, 0, SEEK_END);
   uint32_t size = ftell(file);
   uint8_t* block = new uint8_t[AES_BLOCKLEN];
+  // Remove .encrypted extension
+  char* dest = new char[strlen(filename) + 1];
+  strcpy(dest, filename);
+  char* lastdot = strrchr(dest, '.');
+  *lastdot = '\0';
+  FILE* destfile = fopen(dest, "wb");
   for (uint32_t i = 0; i < size; i += AES_BLOCKLEN) {
     fseek(file, i, SEEK_SET);
     fread(block, 1, AES_BLOCKLEN, file);
     AES_ECB_decrypt(&ctx, block);
-    fseek(file, i, SEEK_SET);
+    fseek(destfile, i, SEEK_SET);
     if (i < (size - AES_BLOCKLEN))
-      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, file);
+      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, destfile);
     else
-      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN - block[AES_BLOCKLEN - 1], file);
+      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN - block[AES_BLOCKLEN - 1], destfile);
   }
-  rewind(file);
   delete[] block;
+  delete[] dest;
+  fclose(file);
+  fclose(destfile);
+  remove(filename);
 }
