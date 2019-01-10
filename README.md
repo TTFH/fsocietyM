@@ -22,4 +22,4 @@ Install Compiler:
 pacman -S mingw-w64-x86_64-toolchain
 
 Compile:  
-g++ -Wall -Werror -O3 main.cpp aes.cpp -o fsocietyM.exe
+g++ -Wall -Werror -Wextra -O3 main.cpp aes.cpp random.cpp DRM.cpp -o fsocietyM -Wno-unused-result -fconcepts
