@@ -10,14 +10,15 @@
       var date = new Date("2019-01-01 00:00:00");
       var x = setInterval(function() {
         var now = new Date();
-        var res = Math.abs(now - date) / 1000;
-        var hours = Math.floor(res / 3600) % 24;
-        var minutes = Math.floor(res / 60) % 60;
-        var seconds = Math.floor(res) % 60;
+        var diff =  Math.max(date - now, 0) / 1000;
+        var hours = Math.floor(diff / 3600) % 24;
+        var minutes = Math.floor(diff / 60) % 60;
+        var seconds = Math.floor(diff) % 60;
         document.getElementById("timer").innerHTML = "<p class='time'>Time left: " +
         "<span class='red'>" + ("00" + hours  ).slice(-2) + "</span>h " +
         "<span class='red'>" + ("00" + minutes).slice(-2) + "</span>m " +
-        "<span class='red'>" + ("00" + seconds).slice(-2) + "</span>s </p>";
+        "<span class='red'>" + ("00" + seconds).slice(-2) + "</span>s</p>";
+        if (diff <= 0) clearInterval(x);
       }, 1000);
     </script>
     <div id="container">
@@ -41,10 +42,10 @@
       </div>
       <div id="menu_ransom">
         <a href="#"><button class="button">Refresh</button></a>
-        <button class="button red">Payment</button>
-        <button class="button">FAQ</button>
-        <button class="button red">Decrypt first file for FREE</button>
-        <button class="button">Support</button>
+        <button onclick="alert('$5.9 million delivered to Battery Park City, 9:00 p.m. tonight, no police. The FBI will not sanction it. You must send one of your chiefs officers and no one else.')" class="button red">Payment</button>
+        <button onclick="alert('If you really value your data, then we suggest you do not waste valuable time searching for other solutions because they do not exist.')" class="button">FAQ</button>
+        <button onclick="alert('Just kidding, it is an all or nothing')" class="button red">Decrypt first file for FREE</button>
+        <button onclick="alert('You can contact us on: username@protonmail.com')" class="button">Support</button>
       </div>
       <div id="jester"></div>
       <div class="diclaimer">
