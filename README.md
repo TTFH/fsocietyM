@@ -22,5 +22,6 @@ Install Compiler:
 pacman -S mingw-w64-x86_64-toolchain
 
 Compile:  
-g++ -Wall -Werror -O3 main.cpp aes.cpp random.cpp DRM.cpp -o fsocietyM -Wno-unused-result -fconcepts  
-g++ -Wall -Werror -O3 decrypter.cpp aes.cpp -o decrypter
+g++ -Wall -Werror -O3 main.cpp aes.cpp base64.cpp random.cpp DRM.cpp -o fsocietyM -Wno-unused-result -fconcepts  
+g++ -Wall -Werror -O3 decrypter.cpp aes.cpp -o decrypter  
+g++ -Wall -Werror -O3 server.cpp base64.cpp random.cpp -o server
