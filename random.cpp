@@ -1,7 +1,9 @@
 #include <time.h>
 #include <stdint.h>
 #include <stdlib.h>
-//#include <stdio.h>
+
+#include "random.h"
+#include "base64.h"
 
 // Convert 8 bits to 1 byte
 uint8_t toByte(bool b[8]) {
@@ -42,8 +44,15 @@ void bernoulli(bool* dist, int N, float p, int& x) {
 }
 
 // Generate 32 bytes random key
-uint8_t* advandedRNG() {
-  srand(time(NULL) ^ clock());
+uint8_t* advandedRNG(char* &id, unsigned int &len, unsigned int seed) {
+  uint8_t bytes[4];
+  bytes[0] = (seed >> 24) & 0xFF;
+  bytes[1] = (seed >> 16) & 0xFF;
+  bytes[2] = (seed >> 8) & 0xFF;
+  bytes[3] = seed & 0xFF;
+  id = EncodeBase64(bytes, 4, len);
+
+  srand(seed);
   uint8_t* key = new uint8_t[32];
   bool* prob = new bool[256];
   int x = 0, x_rel = 0, N = 256;
@@ -51,23 +60,11 @@ uint8_t* advandedRNG() {
   do {
     do {
       q = rand() % (N + 1);
-      //printf("q = %g, %d\n", q, N);
     } while ((q == 0 || q == N) && N != 1);
-
     float p = q / N; // p in [0..1]
     bernoulli(&prob[x_rel], N, p, x);
-    //printf("Generated from %d to %d (%d bits)\n", x_rel, x_rel + x, x + 1);
     N -= x + 1;
-    x_rel += x;
-
-    /*printf("p = %g\n", p);
-    for (int i = 0; i < 256; i++) {
-      if (prob[i]) printf("1"); else printf("0");
-      if (i == x_rel) printf("|");
-    }
-    printf("\n");
-    getchar();*/
-    x_rel++;
+    x_rel += x + 1;
   } while (x_rel != 256);
 
   for (int i = 0; i < 32; i++) {

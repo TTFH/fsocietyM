@@ -113,7 +113,7 @@ int main() {
   } while (c != '\n' && c != EOF);
 
   printf("Are you sure you wanna decrypt?\nA wrong key will make your files unrecoverable forever");
-  printf("(Y/n): ");
+  printf(" (Y/n): ");
   char opt;
   scanf("%c", &opt);
   if (opt == 'Y') {

