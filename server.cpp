@@ -15,7 +15,7 @@ void PrintHex(const uint8_t* str, uint8_t len) {
 }
 
 int main() {
-  printf("Insert Used ID: ");
+  printf("Insert User ID: ");
   char* src = new char[512];
   scanf("%[^\n]s\n", src);
   unsigned int seed_len;
@@ -23,6 +23,7 @@ int main() {
   unsigned int seed = (out[0] << 24) + (out[1] << 16) + (out[2] << 8) + out[3];
   char* id; unsigned int len;
   uint8_t* key = advandedRNG(id, len, seed);
+  printf("The key to decrypt the files is:\n");
   PrintHex(key, 32);
   delete[] src;
   delete[] out;

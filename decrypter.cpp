@@ -116,7 +116,7 @@ int main() {
   printf(" (Y/n): ");
   char opt;
   scanf("%c", &opt);
-  if (opt == 'Y') {
+  if (opt == 'Y' || opt == 'y') {
 #ifdef _WIN32
     SearchFiles("..\\testfolder", key);
 #else
