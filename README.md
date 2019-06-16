@@ -1,9 +1,9 @@
 # fsocietyM
 Cryptowall Ransomware from Mr Robot serie S2E1 and S2E2
 
-This project is purely academic, use at your own risk. I do not encourage in any way the use of this software illegally or to attack targets without their previous authorization.
+This project is purely academic, use at your own risk. I do not encourage in any way the use of this software illegally.
 
-Files are encrypted with AES256 ECB ANSI X9.23, key is stored in file "key.bin"
+Files are encrypted with AES256 ECB ANSI X9.23
 
 ![diff](https://raw.githubusercontent.com/TTFH/fsocietyM/master/example/Cryptowall3.png)
 
@@ -22,6 +22,6 @@ Install Compiler:
 pacman -S mingw-w64-x86_64-toolchain
 
 Compile:  
-g++ -Wall -Werror -O3 main.cpp aes.cpp base64.cpp random.cpp DRM.cpp -o fsocietyM -Wno-unused-result -fconcepts  
+make
 g++ -Wall -Werror -O3 decrypter.cpp aes.cpp -o decrypter  
 g++ -Wall -Werror -O3 server.cpp base64.cpp random.cpp -o server

@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #endif
 
-#include "drm.h"
+#include "../headers/drm.h"
 
 #ifdef DEBUG
 #define print printf

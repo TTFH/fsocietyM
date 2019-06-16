@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "random.h"
-#include "base64.h"
+#include "../headers/random.h"
+#include "../headers/base64.h"
 
 // Convert 8 bits to 1 byte
 uint8_t toByte(bool b[8]) {

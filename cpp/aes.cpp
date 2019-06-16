@@ -2,13 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "aes.h"
-
-#define AES_keyExpSize 240
-
-struct AES_ctx {
-  uint8_t RoundKey[AES_keyExpSize];
-};
+#include "../headers/aes.h"
 
 #define Nb 4 // The number of columns comprising a state in AES
 #define Nk 8
@@ -117,10 +111,6 @@ void KeyExpansion(uint8_t* RoundKey, const uint8_t* Key) {
     RoundKey[j + 2] = RoundKey[k + 2] ^ tempa[2];
     RoundKey[j + 3] = RoundKey[k + 3] ^ tempa[3];
   }
-}
-
-void AES_init_ctx(AES_ctx* ctx, const uint8_t* key) {
-  KeyExpansion(ctx->RoundKey, key);
 }
 
 // This function adds the round key to state.
@@ -280,6 +270,12 @@ void InvCipher(state_t* state,uint8_t* RoundKey) {
   AddRoundKey(0, state, RoundKey);
 }
 
+AES_ctx AES_init_ctx(const uint8_t* key) {
+  AES_ctx ctx;
+  KeyExpansion(ctx.RoundKey, key);
+  return ctx;
+}
+
 void AES_ECB_encrypt(AES_ctx *ctx, uint8_t* buf) {
   // The next function call encrypts the PlainText with the Key using AES algorithm.
   Cipher((state_t*)buf, ctx->RoundKey);
@@ -288,72 +284,4 @@ void AES_ECB_encrypt(AES_ctx *ctx, uint8_t* buf) {
 void AES_ECB_decrypt(AES_ctx* ctx, uint8_t* buf) {
   // The next function call decrypts the PlainText with the Key using AES algorithm.
   InvCipher((state_t*)buf, ctx->RoundKey);
-}
-
-void AES_encrypt(uint8_t* data, uint32_t size, const uint8_t* key) {
-  AES_ctx ctx;
-  AES_init_ctx(&ctx, key);
-  for (uint32_t i = 0; i < size / AES_BLOCKLEN; i++)
-    AES_ECB_encrypt(&ctx, data + i * AES_BLOCKLEN);
-}
-
-void AES_decrypt(uint8_t* data, uint32_t size, const uint8_t* key) {
-  AES_ctx ctx;
-  AES_init_ctx(&ctx, key);
-  for (uint32_t i = 0; i < size / AES_BLOCKLEN; i++)
-    AES_ECB_decrypt(&ctx, data + i * AES_BLOCKLEN);
-}
-
-void AES_stream_encrypt(char* filename, const uint8_t* key) {
-  AES_ctx ctx;
-  AES_init_ctx(&ctx, key);
-  FILE* file = fopen(filename, "rb+");
-  fseek(file, 0, SEEK_END);
-  uint32_t size = ftell(file);
-  uint8_t* block = new uint8_t[AES_BLOCKLEN];
-  for (uint32_t i = 0; i < size; i += AES_BLOCKLEN) {
-    fseek(file, i, SEEK_SET);
-    fread(block, 1, AES_BLOCKLEN, file);
-    AES_ECB_encrypt(&ctx, block);
-    fseek(file, i, SEEK_SET);
-    fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, file);
-  }
-  delete[] block;
-  fclose(file);
-  // Add .encrypted extension
-  char* dest = new char[strlen(filename) + 11];
-  strcpy(dest, filename);
-  strcat(dest, ".encrypted");
-  rename(filename, dest);
-  delete[] dest;
-}
-
-void AES_stream_decrypt(char* filename, const uint8_t* key) {
-  AES_ctx ctx;
-  AES_init_ctx(&ctx, key);
-  FILE* file = fopen(filename, "rb+");
-  fseek(file, 0, SEEK_END);
-  uint32_t size = ftell(file);
-  uint8_t* block = new uint8_t[AES_BLOCKLEN];
-  // Remove .encrypted extension
-  char* dest = new char[strlen(filename) + 1];
-  strcpy(dest, filename);
-  char* lastdot = strrchr(dest, '.');
-  *lastdot = '\0';
-  FILE* destfile = fopen(dest, "wb");
-  for (uint32_t i = 0; i < size; i += AES_BLOCKLEN) {
-    fseek(file, i, SEEK_SET);
-    fread(block, 1, AES_BLOCKLEN, file);
-    AES_ECB_decrypt(&ctx, block);
-    fseek(destfile, i, SEEK_SET);
-    if (i < (size - AES_BLOCKLEN))
-      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN, destfile);
-    else
-      fwrite(block, sizeof(uint8_t), AES_BLOCKLEN - block[AES_BLOCKLEN - 1], destfile);
-  }
-  delete[] block;
-  delete[] dest;
-  fclose(file);
-  fclose(destfile);
-  remove(filename);
 }

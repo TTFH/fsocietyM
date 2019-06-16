@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "base64.h"
+#include "../headers/base64.h"
 
 char* EncodeBase64(const uint8_t* src, unsigned int len, unsigned int &out_len) {
   char* out = new char[len * 4 / 3 + 4];

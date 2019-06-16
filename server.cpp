@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "base64.h"
-#include "random.h"
+#include "headers/base64.h"
+#include "headers/random.h"
 
 void PrintHex(const uint8_t* str, uint8_t len) {
   for (uint8_t i = 0; i < len; i++) {
