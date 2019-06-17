@@ -20,18 +20,20 @@ class IController {
 public:
   virtual void generateKey(char*&, unsigned int&) = 0;
   virtual void encrypt(const char*) = 0;
-  //virtual void decrypt(const char*, const uint8_t*) = 0;
+  virtual void decrypt(const char*, uint8_t*) = 0;
   virtual void destroyKey() = 0;
   virtual unsigned int getCantEncrypted() = 0;
-  //virtual unsigned int getCantDecrypted() = 0;
+  virtual unsigned int getCantDecrypted() = 0;
 };
 
 class Encrypter : public IController {
 private:
   uint8_t* key;
   unsigned int cant_encrypted;
+  unsigned int cant_decrypted;
 
   void encryptFile(char*);
+  void decryptFile(char*);
   void AES_stream_encrypt(char*);
   void AES_stream_decrypt(char*);
 
@@ -39,10 +41,12 @@ private:
   Encrypter();
 public:
   static Encrypter* getInstance();
-  void generateKey(char*&, unsigned int&);
-  void encrypt(const char*);
+  virtual void generateKey(char*&, unsigned int&);
+  virtual void encrypt(const char*);
+  virtual void decrypt(const char*, uint8_t*);
   virtual void destroyKey();
-  unsigned int getCantEncrypted();
+  virtual unsigned int getCantEncrypted();
+  virtual unsigned int getCantDecrypted();
 };
 
 #endif

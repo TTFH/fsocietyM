@@ -28,7 +28,7 @@ $(OBJETIVO): $(ODIR)/$(OBJETIVO).o $(OS)
 	$(CC) $(CCFLAGS) $^ -o $(EJECUTABLE)
 
 clean_bin:
-	rm -f $(OBJETIVO) $(ODIR)/$(OBJETIVO).o $(OS)
+	rm -f $(EJECUTABLE) $(ODIR)/$(OBJETIVO).o $(OS)
 
 clean: clean_bin
 	@rm -f *~ $(HDIR)/*~ $(CPPDIR)/*~
