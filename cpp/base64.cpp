@@ -1,8 +1,12 @@
+#include <ctype.h>
 #include <stdio.h>
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
 #include "../headers/base64.h"
+
+const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 char* EncodeBase64(const uint8_t* src, unsigned int len, unsigned int &out_len) {
   char* out = new char[len * 4 / 3 + 4];
@@ -62,4 +66,25 @@ void PrintBase64(const char* src, unsigned int len) {
   	if ((i+1) % 64 == 0) printf("\n");
   }
   printf("\n");
+}
+
+void PrintHex(const uint8_t* str, uint8_t len) {
+  for (uint8_t i = 0; i < len; i++) {
+    if (i > 0 && i % 16 == 0)
+      printf("\n");
+    printf("%.2X ", str[i]);
+  }
+  printf("\n");
+}
+
+uint8_t chartohex(char c) {
+  assert(isxdigit(c));
+  uint8_t res;
+  if (c >= '0' && c <= '9')
+    res = c - '0';
+  else if (c >= 'a' && c <= 'f')
+    res = c - 'a' + 10;
+  else //if (c >= 'A' && c <= 'F')
+    res = c - 'A' + 10;
+  return res;
 }
