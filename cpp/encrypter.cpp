@@ -118,25 +118,15 @@ void Encrypter::AES_stream_decrypt(char* filename) {
 
 void Encrypter::encryptFile(char* fname) {
   if (!isValidFile(fname)) return;
-  printf("%s\n", fname);
   cant_encrypted++;
-
   ANSI_X9_23(fname);
   this->AES_stream_encrypt(fname);
-
-  /*char* dest = new char[strlen(fname) + 11];
-  strcpy(dest, fname);
-  strcat(dest, ".encrypted");
-  this->AES_stream_decrypt(dest);
-  delete[] dest;*/
 }
 
 void Encrypter::decryptFile(char* fname) {
   if (!isEncryptedFile(fname)) return;
-  printf("Decrypting File: %s\n", fname);
   AES_stream_decrypt(fname);
   cant_decrypted++;
-  printf("File Decrypted!\n");
 }
 
 void Encrypter::generateKey() {
