@@ -23,5 +23,4 @@ pacman -S mingw-w64-x86_64-toolchain
 
 Compile:  
 make  
-g++ -Wall -Werror -O3 decrypter.cpp cpp\aes.cpp -o decrypter  
 g++ -Wall -Werror server.cpp cpp\base64.cpp cpp\random.cpp -o server

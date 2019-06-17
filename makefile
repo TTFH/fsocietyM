@@ -6,7 +6,7 @@ HDIR    = headers
 CPPDIR  = cpp
 ODIR    = obj
 
-MODULOS = aes base64 drm random encrypter factory
+MODULOS = aes base64 random encrypter factory
 
 HS   = $(MODULOS:%=$(HDIR)/%.h)
 CPPS = $(MODULOS:%=$(CPPDIR)/%.cpp)

