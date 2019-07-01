@@ -276,7 +276,7 @@ AES_ctx AES_init_ctx(const uint8_t* key) {
   return ctx;
 }
 
-void AES_ECB_encrypt(AES_ctx *ctx, uint8_t* buf) {
+void AES_ECB_encrypt(AES_ctx* ctx, uint8_t* buf) {
   // The next function call encrypts the PlainText with the Key using AES algorithm.
   Cipher((state_t*)buf, ctx->RoundKey);
 }

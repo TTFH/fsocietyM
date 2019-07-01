@@ -10,7 +10,7 @@ struct AES_ctx {
 
 AES_ctx AES_init_ctx(const uint8_t* key);
 
-void AES_ECB_encrypt(AES_ctx *ctx, uint8_t* buf);
+void AES_ECB_encrypt(AES_ctx* ctx, uint8_t* buf);
 void AES_ECB_decrypt(AES_ctx* ctx, uint8_t* buf);
 
 #endif
