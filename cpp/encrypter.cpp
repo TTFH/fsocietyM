@@ -20,8 +20,10 @@ bool isValidFile(string file) {
   if (ext == NULL) return false;
   ext++;
   bool res = false;
-  for (int i = 0; i < (int)sizeof(extensions) - 1 && !res; i++)
+  for (int i = 0; i < 75 && !res; i++) {
     res = strlen(ext) == strlen(extensions[i]) && strcmp(ext, extensions[i]) == 0;
+    printf("%s: [%s] == [%s] %d\n", file, ext, extensions[i], i);
+  }
   return res;
 }
 

