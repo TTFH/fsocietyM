@@ -6,7 +6,7 @@ HDIR    = headers
 CPPDIR  = cpp
 ODIR    = obj
 
-MODULOS = aes base64 random encrypter factory embedded_file
+MODULOS = aes base64 random encrypter factory priority_queue embedded_file
 
 HS   = $(MODULOS:%=$(HDIR)/%.h)
 CPPS = $(MODULOS:%=$(CPPDIR)/%.cpp)

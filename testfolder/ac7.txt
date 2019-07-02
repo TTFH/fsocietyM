@@ -1,0 +1,161 @@
+Mage 2
+OADF, 508th Tactical Fighter Squadron
+
+Spare 15
+OADF, 444th Fighter Squadron
+
+Strider 1
+OADF, LRSSG, 124th Tactical Fighter Squadron
+
+The Three Strikes
+Independent Squadron
+
+Mage 2   Spare 15     Strider 1          The Three Strikes
+1 2 3 4  5 6 7 8 9 10 1 2 3 4 5 6 7 8 9  20 Mission
+S S S S  S S S S S S  S S S S S S S S S  S  Easy
+S S S S  S S S S S S  S S S S S S S S S  S  Medium
+S S S S  S S S S S S  S S S S S S S S S  S  Hard
+S S S S  S S S S A S  S S S S S S S S S  S  Ace
+X X X X  X X X X X X  X X X X X X X X X  X  MG Only
+X X X            X X          X             No Damage
+
+F-104C-AV
+F-104C	SAAM	GRKT	HPAA
+A-10C	UGB 	RKT 	4AGM
+F-2A	LASM	HVAA	RKT
+F-4E	UGB 	LAGM	SASM
+F-14D	LAAM	GPB 	8AAM
+F-15C	SASM	4AAM	PLSL
+F-15J	HCAA	SAAM	QAAM
+F-15E	6AAM	SFFS	TLS
+F-16C	4AAM	GPB 	SASM
+F/A-18F	QAAM	LASM	EML
+F-22A	QAAM	XSDB	8AAM
+F-35C	SOD 	4AAM	8AGM
+YF-23	HVAA	4AAM	UGB
+M2000-5	GPB 	4AAM	LASM
+RafaleM	HCAA	LACM	LAAM
+Typhoon	LAAM	8AGM	HCAA
+GripenE	SASM	6AAM	LACM
+MiG-21	MGP 	RKT 	SAAM
+MiG-29A	HPAA	LAGM	4AAM
+MiG-31B	LAAM	SAAM	PLSL
+Su-30M2	HPAA	4AGM	4AAM
+Su-30SM	6AAM	QAAM	LAGM
+Su-33	HVAA	LASM	EML
+Su-34	SFFS	HCAA	4AGM
+Su-35S	LAAM	6AAM	LASM
+Su-37	HPAA	4AAM	TLS
+Su-47	SAAM	UGB 	QAAM
+Su-57	4AAM	GPB 	PLSL
+X-02S	4AAM	LASM	EML
+
+ADF-11F	TLS 	QAAM	UAV 	PLSL
+ADF-01	TLS 	4AAM	FAEB	GUN
+ADFX-01	TLS 	MPBM	IEWS	GUN
+
+ADF-11F Raven
+Advanced Dominance Fighter - Gründer Industries / EASA
+TLS Tactical Laser System
+HPAA High-Power Air-to-Air Missile
+UAV Unmanned Aerial Vehicle
+
+ADF-01 Falken
+Advanced Dominance Fighter - Gründer Industries / OADF
+TLS Tactical Laser System
+4AAM 4 Target Air-to-Air Missile
+FAEB Fuel-Air Explosive Bomb
+
+ADFX-01 Morgan
+Advanced Dominance Fighter Experimental - Belkan Air Force / Ustio Air Force
+TLS Tactical Laser System
+MPBM Multi-Purpose Burst Missile
+IEWS Integrated Electronic Warfare System
+
+Su-30SM Mihaly Skin
+Su-30M2 Sol Skin
+X-02S Mihaly Skin
+F-22A Mobius Skin
+
+4AAM 4 Target Air-to-Air Missile
+4AGM 4 Target Air-to-Ground Missile
+6AAM 6 Target Air-to-Air Missile
+8AAM 8 Target Air-to-Air Missile
+8AGM 8 Target Air-to-Ground Missile
+EML Electromagnetic Launcher
+GPB Guided Penetration Bomb
+GRKT Guided Rocket Launcher
+HCAA High-Capacity Air-to-Air Missile
+HPAA High-Power Air-to-Air Missile
+HVAA Hyper-Velocity Air-to-Air Missile
+LAAM Long-Range Air-to-Air Missile
+LACM Land Attack Cruise Missile
+LAGM Long-Range Air-to-Ground Missile
+LASM Long-Range Air-to-Ship Missile
+MGP Machine Gun Pod
+PLSL Pulse Laser
+QAAM Quick Maneuver Air-to-Air Missile
+RKT Rocket Launcher
+SAAM Semi-Active Air-to-Air Missile
+SASM Short-Range Aerial Suppression Missile
+SFFS Self-Forging Fragments Submunitions
+SOD Stand-Off Dispenser
+TGTP Targeting Pod
+TLS Tactical Laser System
+UGB Unguided Bomb
+XSDB Advanced Small Diameter Bomb
+
+UAV Unmanned Aerial Vehicle
+FAEB Fuel-Air Explosive Bomb
+MPBM Multi-Purpose Burst Missile
+IEWS Integrated Electronic Warfare System
+
+ODAM Omnidirectional Air-to-Air Missile
+"This missile's advanced guidance system can lock onto a target at your six o'clock."
+
+
+F-22A Raptor			4AAM	QAAM
+Su-47 Berkut			QAAM	SAAM
+YF-23 Black Widow II	QAAM	SAAM
+Su-35 Flanker-E			6AAM	QAAM
+Typhoon					4AAM	6AAM
+Su-37 Terminator		QAAM	4AAM
+F-15C Eagle				4AAM	SAAM
+Su-33 Flanker-D			SAAM	6AAM
+F-14D Super Tomcat		6AAM	SAAM
+Su-24MP Fencer			ECM 	QAAM
+MiG-29A Fulcrum			QAAM	4AAM
+F-16C Fighting Falcon	QAAM	4AAM
+MiG-21bis Fishbed		MGP 	SAAM
+PAK-FA					4AAM	QAAM	EW1
+CFA-44 Nosferatu		ADMM	EML 	ECM
+ASF-X Shinden II		6AAM	RKTL	LAGM
+Rafale M				6AAM	BDM 	LAGM
+F-15S/MTD				QAAM	SAAM	LAGM
+F-35B Lightning II		QAAM	LAGM	GPB
+F-15E Strike Eagle		4AAM	UGB 	4AGM
+JAS-39C Gripen			QAAM	RKTL	4AAM
+F/A-18F Super Hornet	SAAM	LAGM	ECM
+AV-8B Harrier II plus	4AAM	RKTL	4AGM
+F-16F Fighting Falcon	QAAM	GPB 	ECM
+Mirage 2000-5			4AAM	4AGM	LAGM
+F-4E Phantom II			SAAM	UGB 	ECM
+Su-34 Fullback			4AGM	GPB
+F-2A					LAGM	RKTL
+A-10A Thunderbolt II	4AGM	RKTL
+F-117A Nighthawk		GPB 	LAGM
+Su-25TM Frogfoot		UGB 	MGP
+AH-64D Apache Longbow	RKTL	4AGM	AAM
+Mi-24 Hind				RKTL	AAM 	4AGM
+Ka-50 Hokum				RKTL	SAAM	UGB
+MH-60 Black Hawk		7.62mm
+B-1B Lancer				GPB 	MUGB
+B-2A Spirit				GPB 	MUGB
+AC-130U Spooky			25mm	40mm	120mm
+
+ECM Electronic Countermeasure
+EW1 Experimental Weapon 1
+ADMM All Direction Multi-Purpose Missile
+BDM Bomblet Dispenser
+AAM Air-to-Air Missile
+MUGB Modified Unguided Bomb

